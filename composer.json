@@ -1,0 +1,16 @@
+{
+    "name": "bowphp/policier",
+    "description": "The authicate system",
+    "type": "library",
+    "require": {
+        "lcobucci/jwt": "^4.0@dev"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Franck Dakia",
+            "email": "dakiafranck@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev"
+}
