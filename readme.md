@@ -1,3 +1,3 @@
 # Policier
 
-Policier permet de valider le requête via JWS
+Policier permet de valider la requête via JWS
