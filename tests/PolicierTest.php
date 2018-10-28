@@ -6,20 +6,45 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
 {
     private $policier;
 
+    private $token;
+
     public function setUp()
     {
-        $this->policier = new Policier(require __DIR__.'/../src/config/policier.php');
+        $config = require __DIR__.'/../src/config/policier.php';
+
+        $config['signkey'] = base64_encode('testing');
+
+        $this->policier = Policier::configure($config);
     }
 
-    public function testConfigure()
+    public function testEncode()
     {
-        $token = $this->policier->encode(1, [
+        $id = 1;
+        
+        $this->token = $this->policier->encode($id, [
             'username' => "papac",
             'logged' => true
         ]);
 
-        $this->policier->verify($token);
+        $this->assertTrue($this->policier->verify($this->token));
 
-        $this->policier->parse($token);
+        $token = $this->policier->parse($this->token);
+
+        $this->assertEquals($token->getHeader('alg'), 'HS512');
+
+        $this->assertEquals($token->getHeader('typ'), 'JWT');
+
+        $this->assertEquals($token->getClaim('username'), 'papac');
+
+        $this->assertTrue($token->getClaim('logged'));
+
+        
+        $this->assertTrue($this->policier->verify($this->token));
+
+        $token = $this->policier->decode($this->token);
+
+        $this->assertEquals($token['headers']['alg'], 'HS512');
+
+        $this->assertEquals($token['headers']['typ'], 'JWT');
     }
 }

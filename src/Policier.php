@@ -57,7 +57,7 @@ class Policier
      *
      * @param array $config
      */
-    public function __construct(array $config)
+    private function __construct(array $config)
     {
         $this->config = $config;
 
@@ -142,10 +142,10 @@ class Policier
      * Create new token
      *
      * @param mixed $id
-     * @param array $chaims
+     * @param array $claims
      * @return string
      */
-    public function encode($id, array $chaims)
+    public function encode($id, array $claims)
     {
         $this->builder->setIssuer($this->config['iss']);
         $this->builder->setAudience($this->config['aud']);
@@ -154,15 +154,15 @@ class Policier
         $this->builder->setNotBefore(time() + $this->config['nbf']);
         $this->builder->setExpiration(time() + $this->config['exp']);
 
-        foreach ($chaims as $key => $value) {
-            $this->builder->set($key, json_encode($value));
+        foreach ($claims as $key => $value) {
+            $value = is_array($value) || is_object($value) ? json_encode($value) : $value;
+
+            $this->builder->set($key, $value);
         }
+
+        $this->builder->sign($this->getSignature(), $this->getKey());
 
         $token = $this->builder->getToken();
-
-        if ($this->config['signkey']) {
-            $this->builder->sign($this->getSignature(), $this->getKey());
-        }
 
         return $token;
     }
@@ -178,17 +178,17 @@ class Policier
 
         $headers = [];
 
-        $chaims = [];
+        $claims = [];
 
         foreach ($token->getHeaders() as $key => $value) {
             $headers[$key] = $value;
         }
 
         foreach ($token->getClaims() as $key => $value) {
-            $chaims[$key] = $value;
+            $claims[$key] = $value;
         }
 
-        return compact('headers', 'chaims');
+        return compact('headers', 'claims');
     }
 
     /**
@@ -206,10 +206,11 @@ class Policier
 
     /**
      * Parse token
-     *
+     * 
+     * @param Token $token
      * @return Token
      */
-    public function parse($token)
+    public function parse(Token $token)
     {
         return (new Parser)->parse((string) $token);
     }
@@ -218,10 +219,10 @@ class Policier
      * Validate token
      *
      * @param string $token
-     * @param array $chaims
+     * @param array $claims
      * @return bool
      */
-    public function validate($token, $id, array $chaims)
+    public function validate($token, $id, array $claims)
     {
         $token = $this->parse($token);
 
@@ -229,7 +230,7 @@ class Policier
         $this->validator->setAudience($this->config['aud']);
         $this->validator->setId($id, true);
 
-        foreach ($chaims as $key => $value) {
+        foreach ($claims as $key => $value) {
             $this->validator->set($key, $value);
         }
 
@@ -249,7 +250,8 @@ class Policier
 
         if (method_exists($policier, $method)) {
             return call_user_func_array(
-                [$policier, $method], $args
+                [$policier, $method],
+                $args
             );
         }
 

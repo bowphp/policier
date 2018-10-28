@@ -23,7 +23,7 @@ class PolicierMiddeware
         $bearer = $request->getHeader('Authorization');
 
         if (is_null($bearer) || !preg_match('/Bearer\s+(.+)/', trim($bearer), $match)) {
-            return response()->json(['message' => 'unauthorized', 'error' => false], 403);
+            return response()->json($this->getErrorMessage(), $this->getCode());
         }
 
         $token = trim(end($match));
@@ -31,9 +31,32 @@ class PolicierMiddeware
         $policier = Policier::getInstance();
 
         if ($policier->verify($token)) {
-            return response()->json(['message' => 'unauthorized', 'error' => false], 403);
+            return response()->json($this->getErrorMessage(), $this->getCode());
         }
 
         return $next($request);
+    }
+
+    /**
+     * Get Error message
+     *
+     * @return array
+     */
+    public function getErrorMessage()
+    {
+        return [
+            'message' => 'unauthorized',
+            'error' => true
+        ];
+    }
+
+    /**
+     * Get response code
+     *
+     * @return int
+     */
+    public function getCode()
+    {
+        return 403;
     }
 }
