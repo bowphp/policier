@@ -139,6 +139,29 @@ class Policier
     }
 
     /**
+     * Update config
+     *
+     * @param string $key
+     * @param mixed $value
+     * @return mixed
+     */
+    public function setConfig($key, $value)
+    {
+        $this->config[$key] = $value;
+    }
+
+    /**
+     * Get Config
+     *
+     * @param string $key
+     * @return mixed
+     */
+    public function getConfig($key)
+    {
+        return $this->config[$key] ?? null;
+    }
+
+    /**
      * Create new token
      *
      * @param mixed $id
@@ -151,9 +174,12 @@ class Policier
         $this->builder->setAudience($this->config['aud']);
         $this->builder->setId($id, true);
         $this->builder->setIssuedAt(time());
-        $this->builder->setNotBefore(time() + $this->config['nbf']);
         $this->builder->setExpiration(time() + $this->config['exp']);
 
+        if (isset($this->config['nbf']) && !is_null($this->config['nbf'])) {
+            $this->builder->setNotBefore(time() + $this->config['nbf']);
+        }
+        
         foreach ($claims as $key => $value) {
             $value = is_array($value) || is_object($value) ? json_encode($value) : $value;
 
@@ -169,7 +195,7 @@ class Policier
 
     /**
      * Decode token
-     * 
+     *
      * @param string $token
      * @return array
      */
@@ -207,7 +233,7 @@ class Policier
 
     /**
      * Parse token
-     * 
+     *
      * @param string $token
      * @return Token
      */

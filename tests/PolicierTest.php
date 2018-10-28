@@ -46,7 +46,7 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
      */
     public function testDecode()
     {
-    	$token = $this->readToFile();
+        $token = $this->readToFile();
 
         $this->assertTrue($this->policier->verify($token));
 
@@ -59,21 +59,21 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
 
     /**
      * Write Token
-     * 
+     *
      * @param mixed $token
      */
     public function writeToFile($token)
     {
-    	file_put_contents(sys_get_temp_dir().'/testing', (string) $token);
+        file_put_contents(sys_get_temp_dir().'/testing', (string) $token);
     }
 
     /**
      * Write Token
-     * 
+     *
      * @return string
      */
     public function readToFile()
     {
-    	return trim(file_get_contents(sys_get_temp_dir().'/testing'));
+        return trim(file_get_contents(sys_get_temp_dir().'/testing'));
     }
 }
