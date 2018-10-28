@@ -3,9 +3,10 @@
 namespace Bow\Jwt;
 
 use Lcobucci\JWT\Builder;
+use Lcobucci\JWT\Signer\Keychain;
 use Lcobucci\JWT\Parser;
 use Lcobucci\JWT\Token;
-use Lcobucci\JWT\Signer\Keychain;
+use Lcobucci\JWT\ValidationData;
 
 class Policier
 {
@@ -20,9 +21,14 @@ class Policier
     private $builder;
 
     /**
-     *
+     * @var mixed
      */
     private $alg;
+
+    /**
+     * @var ValidationData
+     */
+    private $validator;
 
     /**
      * @var Policier
@@ -62,6 +68,8 @@ class Policier
         }
 
         $this->alg = new $this->algs[$this->config['alg']];
+
+        $this->validator = new ValidationData;
     }
 
     /**
@@ -160,16 +168,6 @@ class Policier
     }
 
     /**
-     * Parse token
-     *
-     * @return Token
-     */
-    public function parse($token)
-    {
-        return (new Parser)->parse($token);
-    }
-
-    /**
      * Decode token
      *
      * @return array
@@ -203,9 +201,38 @@ class Policier
     {
         $token = $this->parse($token);
 
-        return $token->verify(
-            $this->getSignature(),
-            $this->getKey(true)
-        );
+        return $token->verify($this->getSignature(), $this->getKey(true));
+    }
+
+    /**
+     * Parse token
+     *
+     * @return Token
+     */
+    public function parse($token)
+    {
+        return (new Parser)->parse((string) $token);
+    }
+
+    /**
+     * Validate token
+     *
+     * @param string $token
+     * @param array $chaims
+     * @return bool
+     */
+    public function validate($token, $id, array $chaims)
+    {
+        $token = $this->parse($token);
+
+        $this->validator->setIssuer($this->config['iss']);
+        $this->validator->setAudience($this->config['aud']);
+        $this->validator->setId($id, true);
+
+        foreach ($chaims as $key => $value) {
+            $this->validator->set($key, $value);
+        }
+
+        return $token->validate($this->validator);
     }
 }
