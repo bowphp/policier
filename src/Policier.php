@@ -1,5 +1,7 @@
 <?php
 
+namespace Bow\Jwt;
+
 use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Parser;
 use Lcobucci\JWT\Token;
@@ -102,7 +104,7 @@ class Policier
         $alg = $this->config['alg'];
 
         if (! in_array($alg, ['RS256', 'RS384', 'RS512'])) {
-            return $alg
+            return $alg;
         }
 
         $keychain = new Keychain;
@@ -138,7 +140,7 @@ class Policier
     public function encode($id, array $chaims)
     {
         $this->builder->setIssuer($this->config['iss']);
-        $this->builder->setAudience($this->config['auth']);
+        $this->builder->setAudience($this->config['aud']);
         $this->builder->setId($id, true);
         $this->builder->setIssuedAt(time());
         $this->builder->setNotBefore(time() + $this->config['nbf']);
@@ -180,11 +182,11 @@ class Policier
 
         $chaims = [];
 
-        for ($token->getHeaders() as $key => $value) {
+        foreach ($token->getHeaders() as $key => $value) {
             $headers[$key] = $value;
         }
 
-        for ($token->getClaims() as $key => $value) {
+        foreach ($token->getClaims() as $key => $value) {
             $chaims[$key] = $value;
         }
 
