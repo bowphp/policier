@@ -57,6 +57,32 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($token['headers']['typ'], 'JWT');
     }
 
+    public function testHelperEncode()
+    {
+        $token = policier('encode', $id = 1, [
+            'name' => 'policier'
+        ]);
+
+        $this->assertTrue(is_string($token));
+
+        $token = policier('parse', $token);
+
+        $this->assertEquals($token->getClaim('name'), 'policier');
+
+        $this->writeToFile($token);
+    }
+
+    public function testHelperDecode()
+    {
+        $token = $this->readToFile();
+
+        $this->assertTrue(is_string($token));
+
+        $token = policier('decode', $token);
+
+        $this->assertEquals($token['claims']['name'], 'policier');
+    }
+
     /**
      * Write Token
      *
