@@ -5,7 +5,7 @@ namespace Bow\JWT;
 use Bow\Configuration\Configuration;
 use Bow\Configuration\Loader as Config;
 
-class JsonWebTokenConfiguration extends Configuration
+class PolicierConfiguration extends Configuration
 {
     /**
      * @inheritdoc
