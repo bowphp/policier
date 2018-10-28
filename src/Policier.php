@@ -164,12 +164,13 @@ class Policier
 
         $token = $this->builder->getToken();
 
-        return $token;
+        return (string) $token;
     }
 
     /**
      * Decode token
-     *
+     * 
+     * @param string $token
      * @return array
      */
     public function decode($token)
@@ -199,7 +200,7 @@ class Policier
      */
     public function verify($token)
     {
-        $token = $this->parse($token);
+        $token = $this->parse((string) $token);
 
         return $token->verify($this->getSignature(), $this->getKey(true));
     }
@@ -207,10 +208,10 @@ class Policier
     /**
      * Parse token
      * 
-     * @param Token $token
+     * @param string $token
      * @return Token
      */
-    public function parse(Token $token)
+    public function parse($token)
     {
         return (new Parser)->parse((string) $token);
     }

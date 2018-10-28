@@ -38,13 +38,42 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
 
         $this->assertTrue($token->getClaim('logged'));
 
-        
-        $this->assertTrue($this->policier->verify($this->token));
+        $this->writeToFile($this->token);
+    }
 
-        $token = $this->policier->decode($this->token);
+    /**
+     * @depends testEncode
+     */
+    public function testDecode()
+    {
+    	$token = $this->readToFile();
+
+        $this->assertTrue($this->policier->verify($token));
+
+        $token = $this->policier->decode($token);
 
         $this->assertEquals($token['headers']['alg'], 'HS512');
 
         $this->assertEquals($token['headers']['typ'], 'JWT');
+    }
+
+    /**
+     * Write Token
+     * 
+     * @param mixed $token
+     */
+    public function writeToFile($token)
+    {
+    	file_put_contents(sys_get_temp_dir().'/testing', (string) $token);
+    }
+
+    /**
+     * Write Token
+     * 
+     * @return string
+     */
+    public function readToFile()
+    {
+    	return trim(file_get_contents(sys_get_temp_dir().'/testing'));
     }
 }
