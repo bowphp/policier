@@ -170,11 +170,16 @@ class Policier
      */
     public function encode($id, array $claims)
     {
+        $this->builder->unsign();
         $this->builder->setIssuer($this->config['iss']);
         $this->builder->setAudience($this->config['aud']);
         $this->builder->setId($id, true);
         $this->builder->setIssuedAt(time());
         $this->builder->setExpiration(time() + $this->config['exp']);
+
+        if (isset($this->config['sub'])) {
+            $this->builder->setSubject($this->config['sub']);
+        }
 
         if (isset($this->config['nbf']) && !is_null($this->config['nbf'])) {
             $this->builder->setNotBefore(time() + $this->config['nbf']);
@@ -212,7 +217,7 @@ class Policier
         }
 
         foreach ($token->getClaims() as $key => $value) {
-            $claims[$key] = $value;
+            $claims[$key] = (string) $value;
         }
 
         return compact('headers', 'claims');
