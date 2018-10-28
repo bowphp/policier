@@ -8,7 +8,10 @@
     "autoload": {
         "psr-4": {
             "Bow\\Jwt\\": "src/"
-        }
+        },
+        "files": [
+            "src/config/helper.php"
+        ]
     },
     "license": "MIT",
     "authors": [
