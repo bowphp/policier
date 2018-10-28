@@ -3,7 +3,12 @@
     "description": "The authicate system",
     "type": "library",
     "require": {
-        "lcobucci/jwt": "^4.0@dev"
+        "lcobucci/jwt": "v3.2"
+    },
+    "autoload": {
+        "psr-4": {
+            "Bow\\Jwt\\": "src/"
+        }
     },
     "license": "MIT",
     "authors": [
