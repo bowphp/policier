@@ -12,7 +12,17 @@ class JsonWebTokenConfiguration extends Configuration
      */
     public function create(Config $config)
     {
-        $this->container->bind('jwt', function () {
+        $policier = (array) $config['policier'];
+
+        $policier = array_merge(
+            $policier,
+            require __DIR__.'/config/policer.php'
+        );
+
+        $config['policier'] = $policier;
+
+        $this->container->bind('jwt', function () use ($policier) {
+            return Policier::configure($policier);
         });
     }
 

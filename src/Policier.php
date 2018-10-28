@@ -235,4 +235,24 @@ class Policier
 
         return $token->validate($this->validator);
     }
+
+    /**
+     * __callStatic
+     *
+     * @param string $method
+     * @param array $args
+     * @return mixed
+     */
+    public static function __callStatic($method, $args)
+    {
+        $policier = static::getInstance();
+
+        if (method_exists($policier, $method)) {
+            return call_user_func_array(
+                [$policier, $method], $args
+            );
+        }
+
+        throw new \BadMethodCallException('Method "'.$method.'" not define');
+    }
 }
