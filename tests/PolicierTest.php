@@ -57,13 +57,16 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($token['headers']['typ'], 'JWT');
     }
 
+    /**
+     * @depends testDecode
+     */
     public function testHelperEncode()
     {
         $token = policier('encode', $id = 1, [
             'name' => 'policier'
         ]);
 
-        $this->assertTrue(is_string($token));
+        $this->assertInstanceOf(\Bow\Jwt\Token::class, $token);
 
         $token = policier('parse', $token);
 
@@ -72,6 +75,9 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
         $this->writeToFile($token);
     }
 
+    /**
+     * @depends testHelperEncode
+     */
     public function testHelperDecode()
     {
         $token = $this->readToFile();
