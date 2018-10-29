@@ -1,6 +1,6 @@
 <?php
 
-namespace Bow\JWT;
+namespace Bow\Jwt;
 
 use Bow\Configuration\Configuration;
 use Bow\Configuration\Loader as Config;
