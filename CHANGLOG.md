@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2018-10-29 
+
+- [Fix] Policier configuration namespace [#96b95bf](https://github.com/bowphp/policier/commit/96b95bf9d81625b05e2a569fcfbab993638ce588)
+
 ## [1.0.0] - 2018-10-28 
 
 - [Add] Add travis ci configuration
