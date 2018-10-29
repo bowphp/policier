@@ -2,9 +2,10 @@
 
 namespace Bow\Jwt;
 
+use Bow\Http\Request;
 use Bow\Jwt\Policier;
 
-class PolicierMiddeware
+class PolicierMiddleware
 {
     /**
      * Process middleware
@@ -14,25 +15,27 @@ class PolicierMiddeware
      * @param array $args
      * @return mixed
      */
-    public function process(Request $request, callable $next, array $args = [])
+    public function process(Request $request, callable $next)
     {
-        if (in_array('guest', $args)) {
-            return $next($request);
-        }
-
         $bearer = $request->getHeader('Authorization');
 
-        if (is_null($bearer) || !preg_match('/Bearer\s+(.+)/', trim($bearer), $match)) {
-            return response()->json($this->getErrorMessage(), $this->getCode());
+        if (is_null($bearer) || !preg_match('/^Bearer\s+(.+)/', trim($bearer), $match)) {
+            return response()->json($this->getUnauthorizedMessage(), $this->getCode());
         }
 
         $token = trim(end($match));
 
         $policier = Policier::getInstance();
 
-        if ($policier->verify($token)) {
-            return response()->json($this->getErrorMessage(), $this->getCode());
+        if (!$policier->verify($token)) {
+            return response()->json($this->getUnauthorizedMessage(), $this->getCode());
         }
+
+        if ($policier->isExpired($token)) {
+            return response()->json($this->getExporateMessage(), $this->getCode());
+        }
+
+        $policier->plug($token);
 
         return $next($request);
     }
@@ -42,10 +45,24 @@ class PolicierMiddeware
      *
      * @return array
      */
-    public function getErrorMessage()
+    public function getUnauthorizedMessage()
     {
         return [
             'message' => 'unauthorized',
+            'error' => true
+        ];
+    }
+
+    /**
+     * Get Error message
+     *
+     * @return array
+     */
+    public function getExporateMessage()
+    {
+        return [
+            'message' => 'token is expired',
+            'expired' => true,
             'error' => true
         ];
     }

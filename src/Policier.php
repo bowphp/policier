@@ -32,6 +32,11 @@ class Policier
     private $validator;
 
     /**
+     * @var string
+     */
+    private $token;
+
+    /**
      * @var Policier
      */
     private static $instance;
@@ -95,6 +100,46 @@ class Policier
     public static function getInstance()
     {
         return static::$instance;
+    }
+
+    /**
+     * Plug token
+     *
+     * @param string $token
+     */
+    public function plug($token)
+    {
+        $this->token = $token;
+    }
+
+    /**
+     * Get plug token
+     *
+     * @return string
+     */
+    public function getToken()
+    {
+        return $this->token;
+    }
+
+    /**
+     * Get parsed token
+     *
+     * @return Token
+     */
+    public function getParsedToken()
+    {
+        return $this->parse($this->token);
+    }
+
+    /**
+     * Get decode token
+     *
+     * @return array
+     */
+    public function getDecodeToken()
+    {
+        return $this->decode($this->token);
     }
 
     /**

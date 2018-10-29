@@ -21,7 +21,10 @@ class PolicierConfiguration extends Configuration
 
         $config['policier'] = $policier;
 
-        $this->container->bind('jwt', function () use ($policier) {
+
+        $this->container->bind('jwt', function () use ($policier, $config) {
+            $config->pushMiddleware(['api' => PolicierMiddleware::class]);
+    
             return Policier::configure($policier);
         });
     }

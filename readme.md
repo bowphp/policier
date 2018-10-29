@@ -245,3 +245,34 @@ Via the helper:
 ```php
 policier('validate', $token, $claims);
 ```
+
+## Bow and Policier
+
+If you use [Bow framework](https://github.com/bowphp/app), you can use `Bow\Jwt\PolicierConfiguration::class` configuration plugin and bind middleware `Bow\Jwt\PolicierMiddeware::class` via `api` alias.
+
+Bind configuration in `app\Kernel\Loader.php`:
+
+```php
+public function configurations() 
+{
+  return [
+    ...
+    Bow\Jwt\PolicierConfiguration::class,
+    ...
+  ];
+}
+```
+
+Use the middleware:
+
+```php
+$app->get('/api', function () {
+  $token  = policier()->getToken();
+})->middleware('api');
+```
+
+The token have parsed to Policier instance into middleware process via the `plug` method. Before middleware execution you can:
+
+- Get the token `getToken`
+- Decode the token `getDecodeToken` - [More information of token parsed](#decode-token)
+- Parse the token `getParsedToken` - [More information of token parsed](#parse-token)
