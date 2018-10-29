@@ -42,7 +42,7 @@ final class Token
      *
      * @return string
      */
-    public function getExpirateTime()
+    public function expireIn()
     {
         return $this->expired_in;
     }

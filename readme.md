@@ -142,7 +142,7 @@ $claims = [
 
 $token = $policier->encode($id, $claims);
 
-$token->getExpirateTime(); // Expired In
+$token->expiredIn(); // Expired In
 $token->getToken(); // Token value
 
 echo $token;
@@ -150,7 +150,7 @@ echo $token;
 //=> eyJ0eXAiOiJKV1QiLCJhbGciOiI6IjEifQ.eyJpc3MiOiJsb2NhbGhvc3QiLCJhdWQiOiJsb2NhbGhvc3QiLCJqdGkiOi.l7v0bS0rqnK1IeRGRBTFIH5s2TN9KtgD7BLivApq
 ```
 
-`$token` is instance of `Bow\Jwt\Token` and it implement `__toString` magic method. You can get expiration time with `getExpirateTime` and `getToken` to take token value.
+`$token` is instance of `Bow\Jwt\Token` and it implement `__toString` magic method. You can get expiration time with `expiredIn` and `getToken` to take token value.
 
 Via the helper:
 
