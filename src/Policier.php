@@ -2,6 +2,7 @@
 
 namespace Bow\Jwt;
 
+use Bow\Jwt\Token as EncodedToken;
 use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Signer\Keychain;
 use Lcobucci\JWT\Parser;
@@ -195,7 +196,7 @@ class Policier
 
         $token = $this->builder->getToken();
 
-        return (string) $token;
+        return new EncodedToken((string) $token, $token->getClaim('exp'));
     }
 
     /**
@@ -267,6 +268,19 @@ class Policier
         }
 
         return $token->validate($this->validator);
+    }
+
+    /**
+     * Check if token is expired
+     *
+     * @param string $token
+     * @return bool
+     */
+    public function isExpired($token)
+    {
+        $token = $this->parse($token);
+
+        return $token->isExpired();
     }
 
     /**
