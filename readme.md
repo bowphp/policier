@@ -1,6 +1,6 @@
 # Policier
 
-Policier permet de valider la requête via [JWT](https://jwt.io)
+Police allows to validate the request via [JWT](https://jwt.io)
 
 ## Installation
 
