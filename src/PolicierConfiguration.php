@@ -16,7 +16,7 @@ class PolicierConfiguration extends Configuration
 
         $policier = array_merge(
             $policier,
-            require __DIR__.'/config/policer.php'
+            require __DIR__.'/config/policier.php'
         );
 
         $config['policier'] = $policier;
