@@ -5,11 +5,12 @@
 <a href="https://github.com/bowphp/policier/blob/master/LICENSE" title="license"><img src="https://img.shields.io/github/license/mashape/apistatus.svg?style=flat-square"/></a>
 <a href="https://travis-ci.org/bowphp/policier" title="Travis branch"><img src="https://img.shields.io/travis/bowphp/policier/master.svg?style=flat-square"/></a>
 
-Police allows to validate the request via [JWT](https://jwt.io)
+
+La police permet de valider la demande via [JWT](https://jwt.io)
 
 ## Installation
 
-For install policier, you must use `composer` (PHP package manager) like this. 
+Pour installer la stratégie d'installation, vous devez utiliser `composer` (gestionnaire de paquets PHP) comme ceci.
 
 ```bash
 composer require bowphp/policier
@@ -17,69 +18,67 @@ composer require bowphp/policier
 
 ## Configuration
 
-You can look all configurations options here.
+Vous pouvez regarder toutes les options de configuration ici.
 
 ```php
 return [
   /**
-   * Token expiration time
+   * Heure d'expiration du token
    */
   "exp" => 3600,
 
   /**
-   * Token is usable after this time
+   * Le token est utilisable après cette heure
    */
   "nbf" => 60,
 
   /**
-   * Token was issue
+   * Le token était émis
    */
   "iat" => 60,
 
   /**
-   * Configures the issuer
+   * Configure l'émetteur
    */
   "iss" => "localhost",
 
   /**
-   * Configures the audience
+   * Configure le public
    */
   "aud" => "localhost",
 
   /**
-   * Hashing algorithm being used
+   * Algorithme de hachage utilisé
    *
    * HS256, HS384, HS512, RS256, RS384, RS512, ES256, ES384, ES512,
    */
   "alg" => "HS512",
 
   /**
-   * Signature using your
+   * Signature en utilisant votre
    */
   'signkey' => null,
 
   /**
-   * Signature using your RSA
+   * Signature en utilisant votre RSA
    */
   "keychain" => [
     /**
-     * Path to your private key
+     * Chemin vers votre clé privée
      */
     "private" => null,
 
     /**
-     * Ptah to your public key
+     * Chemin vers votre clé publique
      */
     "public" => null
   ]
 ];
 ```
 
-## Utilisation
+## Usage
 
-Policier is very simply for use and have a clear API.
-
-### Configuration
+Policier est très simple d'utilisation et possède une API claire.
 
 ```php
 use Bow\Jwt\Policier;
@@ -89,7 +88,7 @@ $configure = require "/path/to/config/file.php";
 $policier = Policier::configure($configure);
 ```
 
-Or
+OU
 
 ```php
 use Bow\Jwt\Policier;
@@ -101,43 +100,43 @@ Policier::configure($configure);
 $policier = Policier::getInstance();
 ```
 
-After configuration you can use the `policier` helper:
+Après la configuration, vous pouvez utiliser l’assistant `policier`:
 
 ```php
 policier($action, ...$args);
 ```
 
-The action value must be take one of those values: `encode`, `decode`, `parse`, `verify`, `validate`.
+La valeur d'action doit être l'une de ces valeurs: `encode`, `decode`, `parse`, `verify`, `validate`.
 
-## Update and Get configuration
+## Set or Get configuration
 
-### Update
+### Set Configuration
 
-You can update base config with the `setConfig` method:
+Vous pouvez mettre à jour la configuration de base avec la méthode `setConfig`:
 
 ```php
 $policier->setConfig('exp', time() + 72000);
 ```
 
-### Set configuration
+### Get configuration
 
-You can also get the configuration information with the `getConfig` method:
+Vous pouvez également obtenir les informations de configuration avec la méthode `getConfig`:
 
 ```php
 $policier->getConfig('exp');
-``` 
+```
 
 ### Encode Token
 
-Quicky encode token
+Encoder rapidement le token
 
 ```php
 $id = uniqid();
 
 $claims = [
-	"name" => "Franck",
-	"nickname" => "papac",
-	"logged" => true
+  "name" => "Franck",
+  "nickname" => "papac",
+  "logged" => true
 ];
 
 $token = $policier->encode($id, $claims);
@@ -146,13 +145,12 @@ $token->expiredIn(); // Expired In
 $token->getToken(); // Token value
 
 echo $token;
-//=> example:
 //=> eyJ0eXAiOiJKV1QiLCJhbGciOiI6IjEifQ.eyJpc3MiOiJsb2NhbGhvc3QiLCJhdWQiOiJsb2NhbGhvc3QiLCJqdGkiOi.l7v0bS0rqnK1IeRGRBTFIH5s2TN9KtgD7BLivApq
 ```
 
-`$token` is instance of `Bow\Jwt\Token` and it implement `__toString` magic method. You can get expiration time with `expiredIn` and `getToken` to take token value.
+`$token` est une instance de `Bow\Jwt\Token` et implémente la méthode magique `__toString`. Vous pouvez obtenir l'heure d'expiration avec `expiredIn` et `getToken` pour prendre la valeur du token.
 
-Via the helper:
+Via l'assistant:
 
 ```php
 policier('encode', $id, $claims);
@@ -160,7 +158,7 @@ policier('encode', $id, $claims);
 
 ### Decode Token
 
-Same for decode token.
+Même chose pour le décodage de token.
 
 ```php
 $result = $policier->decode($token);
@@ -170,7 +168,7 @@ echo $result['claims']['name'];
 //=> Franck
 ```
 
-Via the helper:
+Via l'assistant:
 
 ```php
 policier('decode', $token);
@@ -181,21 +179,21 @@ policier('decode', $token);
 ```php
 $token = $policier->parse($token);
 
-$token->hasHeader("old") // Check if header exists
-$token->getHeader("alg", $default = null); // Get one header
-$token->getHeaders(); // Get all header
+$token->hasHeader("old") // Vérifier si l'en-tête existe
+$token->getHeader("alg", $default = null); // Obtenez un en-tête
+$token->getHeaders(); // Obtenir tous les en-têtes
 
-$token->hasClaim("name") // Check if claim exists
-$token->getClaim("name", $default = null); // Get one claim
-$token->getClaims(); // Get all claims
+$token->hasClaim("name") // Vérifier si la réclamation existe
+$token->getClaim("name", $default = null); // Obtenez une réclamation
+$token->getClaims(); // Obtenez toutes les réclamations
 
-$token->isExpired(); // Check is expirate
+$token->isExpired(); // Vérifier si le token a expiré
 
 echo $token->getClaim("name");
 //=> Franck
 ```
 
-Via the helper:
+Via l'assistant:
 
 ```php
 policier('parse', $token);
@@ -203,18 +201,18 @@ policier('parse', $token);
 
 ### Verify Token
 
-Verify if the token is valide with all JWT attribute.
+Vérifier si le jeton est valide avec tous les attributs JWT.
 
 ```php
 $verified = $policier->verify($token);
 if ($verified) {
-	echo "Token is valide";
+  echo "Token is valide";
 } else {
-	echo "Token is not valide";
+  echo "Token is not valide";
 }
 ```
 
-Via the helper:
+Via l'assistant:
 
 ```php
 policier('verify', $token);
@@ -222,38 +220,24 @@ policier('verify', $token);
 
 ### Validate Token
 
-Validate token with claim information and `exp` information.
+Validez le jeton avec les informations de réclamation et les informations `exp`.
 
 ```php
 $claims = [
-	"name" => "Franck",
-	"nickname" => "papac",
-	"logged" => true
+  "name" => "Franck",
+  "nickname" => "papac",
+  "logged" => true
 ];
-
-$validated = $policier->validate($token, $claims);
-
-if ($validated) {
-	echo "Token is valide";
-} else {
-	echo "Token is not valide";
-}
-```
-
-Via the helper:
-
-```php
-policier('validate', $token, $claims);
 ```
 
 ## Bow and Policier
 
-If you use [Bow framework](https://github.com/bowphp/app), you can use `Bow\Jwt\PolicierConfiguration::class` configuration plugin and bind middleware `Bow\Jwt\PolicierMiddeware::class` via `api` alias.
+Si vous utilisez [Bow Framework](https://github.com/bowphp/app), vous pouvez utiliser le plugin de configuration `Bow\Jwt\PolicierConfiguration::class` et lie automatiquement le middleware `Bow\Jwt\PolicierMiddeware::class` qui est utilisable via alias `api`.
 
-Bind configuration in `app\Kernel\Loader.php`:
+Relier la configuration sur `app\Kernel\Loader.php`:
 
 ```php
-public function configurations() 
+public function configurations()
 {
   return [
     ...
@@ -263,7 +247,7 @@ public function configurations()
 }
 ```
 
-Use the middleware:
+Utilisez le middleware:
 
 ```php
 $app->get('/api', function () {
@@ -271,8 +255,10 @@ $app->get('/api', function () {
 })->middleware('api');
 ```
 
-The token have parsed to Policier instance into middleware process via the `plug` method. Before middleware execution you can:
+Le token a été analysé dans l'instance de Policier dans un processus middleware via la méthode `plug`. Avant l'exécution du middleware, vous pouvez:
 
-- Get the token `getToken`
-- Decode the token `getDecodeToken` - [More information of token parsed](#decode-token)
-- Parse the token `getParsedToken` - [More information of token parsed](#parse-token)
+- Obtenez le token avec `getToken`
+- Décoder le token avec `getDecodeToken` - [More information of token parsed](#decode-token)
+- Analyser le token avec `getParsedToken` - [More information of token parsed](#parse-token)
+
+> N'hésitez pas à donner votre avis sur la qualité de la documentation ou proposez des correctifs.
