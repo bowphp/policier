@@ -18,7 +18,6 @@ if (!function_exists('policier')) {
 
         if (!in_array($action, ['decode', 'encode', 'verify', 'validate', 'parse'])) {
             throw new \BadMethodCallException("Action not define");
-            
         }
 
         return call_user_func_array([$policier, $action], $args);
