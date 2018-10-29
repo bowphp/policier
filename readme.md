@@ -109,6 +109,24 @@ policier($action, ...$args);
 
 The action value must be take one of those values: `encode`, `decode`, `parse`, `verify`, `validate`.
 
+## Update and Get configuration
+
+### Update
+
+You can update base config with the `setConfig` method:
+
+```php
+$policier->setConfig('exp', time() + 72000);
+```
+
+### Set configuration
+
+You can also get the configuration information with the `getConfig` method:
+
+```php
+$policier->getConfig('exp');
+``` 
+
 ### Encode Token
 
 Quicky token token
