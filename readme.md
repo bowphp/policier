@@ -129,7 +129,7 @@ $policier->getConfig('exp');
 
 ### Encode Token
 
-Quicky token token
+Quicky encode token
 
 ```php
 $id = uniqid();
@@ -141,10 +141,16 @@ $claims = [
 ];
 
 $token = $policier->encode($id, $claims);
+
+$token->getExpirateTime(); // Expired In
+$token->getToken(); // Token value
+
 echo $token;
 //=> example:
 //=> eyJ0eXAiOiJKV1QiLCJhbGciOiI6IjEifQ.eyJpc3MiOiJsb2NhbGhvc3QiLCJhdWQiOiJsb2NhbGhvc3QiLCJqdGkiOi.l7v0bS0rqnK1IeRGRBTFIH5s2TN9KtgD7BLivApq
 ```
+
+`$token` is instance of `Bow\Jwt\Token` and it implement `__toString` magic method. You can get expiration time with `getExpirateTime` and `getToken` to take token value.
 
 Via the helper:
 
@@ -175,10 +181,15 @@ policier('decode', $token);
 ```php
 $token = $policier->parse($token);
 
-$token->getHeader("alg"); // Get one header
+$token->hasHeader("old") // Check if header exists
+$token->getHeader("alg", $default = null); // Get one header
 $token->getHeaders(); // Get all header
-$token->getClaim("name"); // Get one claim
+
+$token->hasClaim("name") // Check if claim exists
+$token->getClaim("name", $default = null); // Get one claim
 $token->getClaims(); // Get all claims
+
+$token->isExpired(); // Check is expirate
 
 echo $token->getClaim("name");
 //=> Franck
