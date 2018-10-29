@@ -1,5 +1,10 @@
 # Policier
 
+<a href="https://bowphp.github.io/docs/policier" title="docs"><img src="https://img.shields.io/badge/docs-read%20docs-blue.svg?style=flat-square"/></a>
+<a href="https://packagist.org/packages/bowphp/policier" title="version"><img src="https://img.shields.io/packagist/v/bowphp/policier.svg?style=flat-square"/></a>
+<a href="https://github.com/bowphp/policier/blob/master/LICENSE" title="license"><img src="https://img.shields.io/github/license/mashape/apistatus.svg?style=flat-square"/></a>
+<a href="https://travis-ci.org/bowphp/policier" title="Travis branch"><img src="https://img.shields.io/travis/bowphp/policier/master.svg?style=flat-square"/></a>
+
 Police allows to validate the request via [JWT](https://jwt.io)
 
 ## Installation
