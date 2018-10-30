@@ -219,10 +219,11 @@ Vérifier si le jeton est valide avec tous les attributs JWT.
 
 ```php
 $verified = $policier->verify($token);
+
 if ($verified) {
-  echo "Token is valide";
+  echo "Token est valide";
 } else {
-  echo "Token is not valide";
+  echo "Token n'est pas valide";
 }
 ```
 
