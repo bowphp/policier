@@ -243,6 +243,14 @@ $claims = [
   "nickname" => "papac",
   "logged" => true
 ];
+
+$validated = $policier->validate($token, $claims);
+
+if ($validated) {
+  echo "Les informations sont valides";
+} else {
+  echo "Les informations ne sont pas valides";
+}
 ```
 
 ## Bow and Policier
