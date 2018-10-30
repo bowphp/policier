@@ -16,6 +16,9 @@
   - [Parse Token](#parse-token)
   - [Verify Token](#verify-token)
   - [Validate Token](#validate-token)
+- [Bow and Policier](#bow-and-policier)
+  - [Personnalisation du Middleware](#personnalisation-du-middleware)
+  - [Publier le middleware](#publier-le-middleware)
 
 La police permet de valider la demande via [JWT](https://jwt.io)
 
@@ -338,7 +341,7 @@ class CustomPolicierMiddleware extends PolicierMiddeware
 }
 ```
 
-#### Publier le middleware
+### Publier le middleware
 
 Pour publier le middleware personnalisé et écraser celui par defaut de Policier c'est très simple, il suffit seulement d'ajouter le middleware dans le fichier `app/Kernel/Loader.php` avec la clé `api`.
 
