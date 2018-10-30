@@ -267,7 +267,7 @@ policier('validate', $token, $claims);
 
 ## Bow and Policier
 
-Si vous utilisez [Bow Framework](https://github.com/bowphp/app), vous pouvez utiliser le plugin de configuration `Bow\Jwt\PolicierConfiguration::class` qui lie automatiquement le middleware `Bow\Jwt\PolicierMiddeware::class`. Ce middleware est utilisable via l'alias `api`.
+Si vous utilisez [Bow Framework](https://github.com/bowphp/app), vous pouvez utiliser le plugin de configuration `Bow\Jwt\PolicierConfiguration::class` qui lie automatiquement le middleware `Bow\Jwt\PolicierMiddleware::class`. Ce middleware est utilisable via l'alias `api`.
 
 Relier la configuration sur `app\Kernel\Loader.php`:
 
@@ -298,7 +298,7 @@ Le token a été analysé dans l'instance de Policier dans un processus middlewa
 
 ### Personnalisation du Middleware
 
-Notez que vous pouvez créer un autre middleware qui étendra le middleware par defaut `Bow\Jwt\PolicierMiddeware::class`. Ce qui vous donne la possibilité de changer les messages d'erreur en surchargant les methodes `getUnauthorizedMessage`, `getExpirateMessage` et `getCode`.
+Notez que vous pouvez créer un autre middleware qui étendra le middleware par defaut `Bow\Jwt\PolicierMiddleware::class`. Ce qui vous donne la possibilité de changer les messages d'erreur en surchargant les methodes `getUnauthorizedMessage`, `getExpirateMessage`, `getExpirateCode` et `getUnauthorizedCode`.
 
 ```bash
 php bow add:middleware CustomPolicierMiddleware
@@ -309,9 +309,9 @@ et ensuite vous pouvez faire ceci:
 ```php
 
 use Bow\Http\Request;
-use Bow\Jwt\PolicierMiddeware;
+use Bow\Jwt\PolicierMiddleware;
 
-class CustomPolicierMiddleware extends PolicierMiddeware
+class CustomPolicierMiddleware extends PolicierMiddleware
 {
   /**
    * Get Error message
@@ -331,7 +331,7 @@ class CustomPolicierMiddleware extends PolicierMiddeware
    *
    * @return array
    */
-  public function getExporateMessage()
+  public function getExpirateMessage()
   {
     return [
       'message' => 'token is expired',
