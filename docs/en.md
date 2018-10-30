@@ -97,7 +97,7 @@ $configure = require "/path/to/config/file.php";
 $policier = Policier::configure($configure);
 ```
 
-**Ou**
+You can also do like this:
 
 ```php
 use Bow\Jwt\Policier;
