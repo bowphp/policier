@@ -3,13 +3,13 @@
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [Usage](#usage)
-  - [Mise à jour ou Récupération de la Configuration](#mise-a-jour-ou-recuperation-de-la-configuration)
-    - [Mise à jour de la Configuration](#mise-a-jour-de-la-configuration)
-    - [Récupération de la Configuration](#recuperation-de-la-configuration)
+  - [Mise à jour ou Récupération de la configuration](##mise-à-jour-ou-récupération-de-la-configuration)
+    - [Mise à jour de la Configuration](#mise-à-jour-de-la-configuration)
+    - [Récupération de la Configuration](#récupération-de-la-configuration)
   - [Encoder un Token](#encoder-un-token)
   - [Décoder un Token](#decoder-un-token)
   - [Transformer un Token](#transformer-un-token)
-  - [Vérifier un Token](#verifier-un-token)
+  - [Vérifier un Token](#vérifier-un-token)
   - [Valider un Token](#valider-un-token)
 - [Bow Framework et Policier](#bow-framework-et-policier)
   - [Personnalisation du Middleware](#personnalisation-du-middleware)
@@ -208,7 +208,7 @@ Via l'assistant:
 policier('parse', $token);
 ```
 
-### Vérifier Token
+### Vérifier un Token
 
 Vérifier si le jeton est valide avec tous les attributs JWT.
 
