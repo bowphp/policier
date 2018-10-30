@@ -253,6 +253,18 @@ if ($validated) {
 }
 ```
 
+Via l'assistant:
+
+```php
+$claims = [
+  "name" => "Franck",
+  "nickname" => "papac",
+  "logged" => true
+];
+
+policier('validate', $token, $claims);
+```
+
 ## Bow and Policier
 
 Si vous utilisez [Bow Framework](https://github.com/bowphp/app), vous pouvez utiliser le plugin de configuration `Bow\Jwt\PolicierConfiguration::class` qui lie automatiquement le middleware `Bow\Jwt\PolicierMiddeware::class`. Ce middleware est utilisable via l'alias `api`.
