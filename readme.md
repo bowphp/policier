@@ -13,4 +13,4 @@ To install the installation policy, you must use `composer` (PHP package manager
 composer require bowphp/policier
 ```
 
-Documentation is available in [english]('./docs/en.md') and [frensh]('./docs/fr.md')
+Documentation is available in [english](./docs/en.md) and [frensh](./docs/fr.md)
