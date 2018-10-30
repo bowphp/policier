@@ -20,7 +20,7 @@ class PolicierMiddleware
         $bearer = $request->getHeader('Authorization');
 
         if (is_null($bearer) || !preg_match('/^Bearer\s+(.+)/', trim($bearer), $match)) {
-            return response()->json($this->getUnauthorizedMessage(), $this->getCode());
+            return response()->json($this->getUnauthorizedMessage(), $this->getUnauthorizedCode());
         }
 
         $token = trim(end($match));
@@ -28,11 +28,11 @@ class PolicierMiddleware
         $policier = Policier::getInstance();
 
         if (!$policier->verify($token)) {
-            return response()->json($this->getUnauthorizedMessage(), $this->getCode());
+            return response()->json($this->getUnauthorizedMessage(), $this->getUnauthorizedCode());
         }
 
         if ($policier->isExpired($token)) {
-            return response()->json($this->getExporateMessage(), $this->getCode());
+            return response()->json($this->getExpirateMessage(), $this->getExpirateCode());
         }
 
         $policier->plug($token);
@@ -58,7 +58,7 @@ class PolicierMiddleware
      *
      * @return array
      */
-    public function getExporateMessage()
+    public function getExpirateMessage()
     {
         return [
             'message' => 'token is expired',
@@ -68,11 +68,21 @@ class PolicierMiddleware
     }
 
     /**
-     * Get response code
+     * Get Expirate response code
      *
      * @return int
      */
-    public function getCode()
+    public function getExpirateCode()
+    {
+        return 403;
+    }
+
+    /**
+     * Get Unauthorized response code
+     *
+     * @return int
+     */
+    public function getUnauthorizedCode()
     {
         return 403;
     }
