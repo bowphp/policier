@@ -15,15 +15,18 @@ class PolicierConfiguration extends Configuration
         $policier = (array) $config['policier'];
 
         $policier = array_merge(
-            $policier,
-            require __DIR__.'/config/policier.php'
+            require __DIR__.'/config/policier.php',
+            $policier
         );
 
         $config['policier'] = $policier;
 
-
         $this->container->bind('jwt', function () use ($policier, $config) {
-            $config->pushMiddleware(['api' => PolicierMiddleware::class]);
+            $name = isset($policier['middleware_name']) ? $policier['middleware_name'] : 'api';
+
+            $config->pushMiddleware([
+                $name => PolicierMiddleware::class
+            ]);
     
             return Policier::configure($policier);
         });

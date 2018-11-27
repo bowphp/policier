@@ -81,7 +81,12 @@ return [
      * Chemin vers votre clé publique
      */
     "public" => null
-  ]
+  ],
+    
+  /**
+   * Nom du middleware Policier
+   */
+  'middleware_name' => 'api',
 ];
 ```
 
