@@ -15,7 +15,7 @@ class PolicierMiddleware
      * @param array $args
      * @return mixed
      */
-    public function process(Request $request, callable $next)
+    final public function process(Request $request, callable $next)
     {
         $bearer = $request->getHeader('Authorization');
 
