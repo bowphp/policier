@@ -20,7 +20,7 @@ class PolicierMiddleware
         $bearer = $request->getHeader('Authorization');
 
         if (is_null($bearer) || !preg_match('/^Bearer\s+(.+)/', trim($bearer), $match)) {
-            return response()->json($this->getUnauthorizedMessage(), $this->getUnauthorizedCode());
+            return response()->json($this->getUnauthorizedMessage(), $this->getUnauthorizedStatusCode());
         }
 
         $token = trim(end($match));
@@ -28,11 +28,11 @@ class PolicierMiddleware
         $policier = Policier::getInstance();
 
         if (!$policier->verify($token)) {
-            return response()->json($this->getUnauthorizedMessage(), $this->getUnauthorizedCode());
+            return response()->json($this->getUnauthorizedMessage(), $this->getUnauthorizedStatusCode());
         }
 
         if ($policier->isExpired($token)) {
-            return response()->json($this->getExpirateMessage(), $this->getExpirateCode());
+            return response()->json($this->getExpirationMessage(), $this->getExpirationStatusCode());
         }
 
         $policier->plug($token);
@@ -58,7 +58,7 @@ class PolicierMiddleware
      *
      * @return array
      */
-    public function getExpirateMessage()
+    public function getExpirationMessage()
     {
         return [
             'message' => 'token is expired',
@@ -72,7 +72,7 @@ class PolicierMiddleware
      *
      * @return int
      */
-    public function getExpirateCode()
+    public function getExpirationStatusCode()
     {
         return 403;
     }
@@ -82,7 +82,7 @@ class PolicierMiddleware
      *
      * @return int
      */
-    public function getUnauthorizedCode()
+    public function getUnauthorizedStatusCode()
     {
         return 403;
     }

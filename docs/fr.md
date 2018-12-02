@@ -314,7 +314,7 @@ use Bow\Jwt\PolicierMiddleware;
 class CustomPolicierMiddleware extends PolicierMiddleware
 {
   /**
-   * Get Error message
+   * Obtenir le message d'erreur
    *
    * @return array
    */
@@ -327,11 +327,11 @@ class CustomPolicierMiddleware extends PolicierMiddleware
   }
 
   /**
-   * Get Error message
+   * Obtenir le message d'erreur
    *
    * @return array
    */
-  public function getExpirateMessage()
+  public function getExpirationMessage()
   {
     return [
       'message' => 'token is expired',
@@ -341,21 +341,21 @@ class CustomPolicierMiddleware extends PolicierMiddleware
   }
 
   /**
-   * Get Expirate response code
+   * Obtenir le code de réponse non autorisé
    *
    * @return int
    */
-  public function getExpirateCode()
+  public function getUnauthorizedStatusCode()
   {
     return 403;
   }
 
   /**
-   * Get Unauthorized response code
+   * Obtenir le code de réponse
    *
    * @return int
    */
-  public function getUnauthorizedCode()
+  public function getExpirationStatusCode()
   {
     return 403;
   }

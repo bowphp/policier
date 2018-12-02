@@ -331,7 +331,7 @@ class CustomPolicierMiddleware extends PolicierMiddleware
    *
    * @return array
    */
-  public function getExpirateMessage()
+  public function getExpirationMessage()
   {
     return [
       'message' => 'token is expired',
@@ -341,21 +341,21 @@ class CustomPolicierMiddleware extends PolicierMiddleware
   }
 
   /**
-   * Get Expirate response code
+   * Get Unauthorized response code
    *
    * @return int
    */
-  public function getExpirateCode()
+  public function getUnauthorizedStatusCode()
   {
     return 403;
   }
 
   /**
-   * Get Unauthorized response code
+   * Get Expirate response code
    *
    * @return int
    */
-  public function getUnauthorizedCode()
+  public function getExpirationStatusCode()
   {
     return 403;
   }
