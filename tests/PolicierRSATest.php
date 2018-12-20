@@ -2,7 +2,7 @@
 
 use Policier\Policier;
 
-class PolicierTest extends \PHPUnit\Framework\TestCase
+class PolicierRSATest extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var Policier
@@ -21,17 +21,17 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
      */
     public function setUp()
     {
-        $policier = Policier::configure(
-            require __DIR__.'/../config/policier.php'
-        );
+        $config = require __DIR__.'/../config/policier.php';
+        
+        $policier = Policier::configure($config);
 
         $policier->setConfig([
-            'alg' => 'HS512',
-            'signkey' => trim(file_get_contents(__DIR__.'/seeds/keystring')),
+            'singkey' => null,
+            'alg' => 'RS256',
             'keychain' => [
-                'private' => null,
-                'public' => null,
-            ]
+                'private' => trim(__DIR__.'/seeds/rsa/RS256.key'),
+                'public' => trim(__DIR__.'/seeds/rsa/RS256.key.pub'),
+            ],
         ]);
 
         $this->policier = Policier::getInstance();
@@ -50,7 +50,7 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
 
         $token = $this->policier->parse($this->token);
 
-        $this->assertEquals($token->getHeader('alg'), 'HS512');
+        $this->assertEquals($token->getHeader('alg'), 'RS256');
 
         $this->assertEquals($token->getHeader('typ'), 'JWT');
 
@@ -72,7 +72,7 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
 
         $token = $this->policier->decode($token);
 
-        $this->assertEquals($token['headers']['alg'], 'HS512');
+        $this->assertEquals($token['headers']['alg'], 'RS256');
 
         $this->assertEquals($token['headers']['typ'], 'JWT');
     }
