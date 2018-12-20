@@ -178,13 +178,28 @@ class Policier
 
         if (!$public) {
             return $this->keychain->getPrivateKey(
-                $this->config['keychain']['private']
+                $this->getKeyContents($this->config['keychain']['private'])
             );
         }
 
         return $this->keychain->getPublicKey(
-            $this->config['keychain']['public']
+            $this->getKeyContents($this->config['keychain']['public'])
         );
+    }
+
+    /**
+     * Get key content
+     *
+     * @param string $key
+     * @return string
+     */
+    private function getKeyContents($key)
+    {
+        if (is_file($key)) {
+            return file_get_contents($key);
+        }
+
+        return $key;
     }
 
     /**
