@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.0] - 2018-12-20
+
+- [Fix] Many bug fixed: RSA support
+- [Add] Laravel Package support
+- [Change] Change de application namespace
+
 ## [1.0.2] - 2018-10-29
 
 - [Change] Update unity test [#cfc2cb0](#https://github.com/bowphp/policier/commit/cfc2cb0db9e034d9f5e48c6aa7a4d98d28bd4df6)
