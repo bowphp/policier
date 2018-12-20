@@ -1,26 +1,27 @@
 <?php
 
-namespace Bow\Jwt;
+namespace Policier;
 
-use Bow\Http\Request;
-use Bow\Jwt\Policier;
+use Policier\Policier;
 
-class PolicierMiddleware
+abstract class PolicierMiddlewarHandler
 {
     /**
-     * Process middleware
+     * Process Middleware
      *
-     * @param Reqyest $request
-     * @param callable $callable
-     * @param array $args
+     * @param mixed $request
+     * @param mixed $next
      * @return mixed
      */
-    final public function process(Request $request, callable $next)
+    public function make($request, $next)
     {
         $bearer = $request->getHeader('Authorization');
 
         if (is_null($bearer) || !preg_match('/^Bearer\s+(.+)/', trim($bearer), $match)) {
-            return response()->json($this->getUnauthorizedMessage(), $this->getUnauthorizedStatusCode());
+            return response()->json(
+                $this->getUnauthorizedMessage(),
+                $this->getUnauthorizedStatusCode()
+            );
         }
 
         $token = trim(end($match));
@@ -28,11 +29,17 @@ class PolicierMiddleware
         $policier = Policier::getInstance();
 
         if (!$policier->verify($token)) {
-            return response()->json($this->getUnauthorizedMessage(), $this->getUnauthorizedStatusCode());
+            return response()->json(
+                $this->getUnauthorizedMessage(),
+                $this->getUnauthorizedStatusCode()
+            );
         }
 
         if ($policier->isExpired($token)) {
-            return response()->json($this->getExpirationMessage(), $this->getExpirationStatusCode());
+            return response()->json(
+                $this->getExpirationMessage(),
+                $this->getExpirationStatusCode()
+            );
         }
 
         $policier->plug($token);

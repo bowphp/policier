@@ -1,6 +1,6 @@
 <?php
 
-namespace Bow\Jwt\Exception;
+namespace Policier\Exception;
 
 class AlgorithmNotFoundException extends \Exception
 {

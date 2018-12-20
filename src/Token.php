@@ -1,6 +1,6 @@
 <?php
 
-namespace Bow\Jwt;
+namespace Policier;
 
 final class Token
 {

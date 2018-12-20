@@ -1,8 +1,8 @@
 <?php
 
-namespace Bow\Jwt;
+namespace Policier;
 
-use Bow\Jwt\Token as EncodedToken;
+use Policier\Token as EncodedToken;
 use Lcobucci\JWT\Builder;
 use Lcobucci\JWT\Signer\Keychain;
 use Lcobucci\JWT\Parser;
@@ -12,31 +12,43 @@ use Lcobucci\JWT\ValidationData;
 class Policier
 {
     /**
-     * @var Policier
+     * The configuration
+     *
+     * @var array
      */
     private $config;
 
     /**
+     * The Lcobucci Token builder
+     *
      * @var Builder
      */
     private $builder;
 
     /**
+     * The algorithm defined
+     *
      * @var mixed
      */
     private $alg;
 
     /**
+     * The Data validation instance
+     *
      * @var ValidationData
      */
     private $validator;
 
     /**
+     * The current Token
+     *
      * @var string
      */
     private $token;
 
     /**
+     * The Policier instance
+     *
      * @var Policier
      */
     private static $instance;
@@ -158,7 +170,7 @@ class Policier
         $alg = $this->config['alg'];
 
         if (! in_array($alg, ['RS256', 'RS384', 'RS512'])) {
-            return $alg;
+            return $key;
         }
 
         $keychain = new Keychain;
@@ -187,13 +199,14 @@ class Policier
     /**
      * Update config
      *
-     * @param string $key
-     * @param mixed $value
+     * @param array $config
      * @return mixed
      */
-    public function setConfig($key, $value)
+    public function setConfig(array $config)
     {
-        $this->config[$key] = $value;
+        $this->config = array_merge($this->config, $config);
+
+        static::$instance = new static($this->config);
     }
 
     /**
@@ -231,17 +244,22 @@ class Policier
             $this->builder->setNotBefore(time() + $this->config['nbf']);
         }
         
+        // Bind claim information before encoding
         foreach ($claims as $key => $value) {
             $value = is_array($value) || is_object($value) ? json_encode($value) : $value;
 
             $this->builder->set($key, $value);
         }
 
+        // Make signature
         $this->builder->sign($this->getSignature(), $this->getKey());
 
         $token = $this->builder->getToken();
 
-        return new EncodedToken((string) $token, $token->getClaim('exp'));
+        return new EncodedToken(
+            (string) $token,
+            $token->getClaim('exp')
+        );
     }
 
     /**
@@ -279,7 +297,10 @@ class Policier
     {
         $token = $this->parse((string) $token);
 
-        return $token->verify($this->getSignature(), $this->getKey(true));
+        return $token->verify(
+            $this->getSignature(),
+            $this->getKey(true)
+        );
     }
 
     /**
@@ -290,7 +311,8 @@ class Policier
      */
     public function parse($token)
     {
-        return (new Parser)->parse((string) $token);
+        return (new Parser)
+            ->parse((string) $token);
     }
 
     /**
@@ -309,10 +331,13 @@ class Policier
         $this->validator->setId($id, true);
 
         foreach ($claims as $key => $value) {
-            $this->validator->set($key, $value);
+            $this->validator
+                ->set($key, $value);
         }
 
-        return $token->validate($this->validator);
+        return $token->validate(
+            $this->validator
+        );
     }
 
     /**
