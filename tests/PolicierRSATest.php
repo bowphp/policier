@@ -22,15 +22,15 @@ class PolicierRSATest extends \PHPUnit\Framework\TestCase
     public function setUp()
     {
         $config = require __DIR__.'/../config/policier.php';
-        
+
         $policier = Policier::configure($config);
 
         $policier->setConfig([
             'singkey' => null,
             'alg' => 'RS256',
             'keychain' => [
-                'private' => trim(__DIR__.'/seeds/rsa/RS256.key'),
-                'public' => trim(__DIR__.'/seeds/rsa/RS256.key.pub'),
+                'private' => trim(__DIR__.'/seeds/rsa/private.key'),
+                'public' => trim(__DIR__.'/seeds/rsa/public.key'),
             ],
         ]);
 

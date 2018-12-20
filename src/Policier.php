@@ -33,6 +33,13 @@ class Policier
     private $alg;
 
     /**
+     * The RSA and ECDSA key loader
+     *
+     * @var mixed
+     */
+    private $keychain;
+
+    /**
      * The Data validation instance
      *
      * @var ValidationData
@@ -86,6 +93,8 @@ class Policier
         }
 
         $this->alg = new $this->algs[$this->config['alg']];
+
+        $this->keychain = new Keychain;
 
         $this->validator = new ValidationData;
     }
@@ -161,27 +170,19 @@ class Policier
      */
     public function getKey($public = false)
     {
-        $key = $this->config['signkey'];
-
-        if ($key != null) {
-            return $key;
-        }
-
         $alg = $this->config['alg'];
 
-        if (! in_array($alg, ['RS256', 'RS384', 'RS512'])) {
-            return $key;
+        if (! in_array($alg, ['RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512'])) {
+            return $this->config['signkey'];
         }
 
-        $keychain = new Keychain;
-
         if (!$public) {
-            return $keychain->getPrivateKey(
+            return $this->keychain->getPrivateKey(
                 $this->config['keychain']['private']
             );
         }
 
-        return $keychain->getPublicKey(
+        return $this->keychain->getPublicKey(
             $this->config['keychain']['public']
         );
     }
