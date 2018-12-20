@@ -1,5 +1,5 @@
 {
-    "name": "bowphp/policier",
+    "name": "policier/policier",
     "description": "The authicate system",
     "type": "library",
     "require": {
@@ -7,16 +7,16 @@
     },
     "autoload": {
         "psr-4": {
-            "Bow\\Jwt\\": "src/"
+            "Policier\\": "src/"
         },
         "files": [
-            "src/config/helper.php"
+            "config/helper.php"
         ]
     },
     "license": "MIT",
     "authors": [
         {
-            "name": "Franck Dakia",
+            "name": "Franck DAKIA",
             "email": "dakiafranck@gmail.com"
         }
     ],
