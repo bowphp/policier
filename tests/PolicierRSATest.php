@@ -27,10 +27,10 @@ class PolicierRSATest extends \PHPUnit\Framework\TestCase
 
         $policier->setConfig([
             'singkey' => null,
-            'alg' => 'RS256',
+            'alg' => 'RS512',
             'keychain' => [
-                'private' => trim(__DIR__.'/seeds/rsa/private.key'),
-                'public' => trim(__DIR__.'/seeds/rsa/public.key'),
+                'private' => trim(file_get_contents(__DIR__.'/seeds/rsa/private.key')),
+                'public' => trim(file_get_contents(__DIR__.'/seeds/rsa/public.key')),
             ],
         ]);
 
@@ -50,7 +50,7 @@ class PolicierRSATest extends \PHPUnit\Framework\TestCase
 
         $token = $this->policier->parse($this->token);
 
-        $this->assertEquals($token->getHeader('alg'), 'RS256');
+        $this->assertEquals($token->getHeader('alg'), 'RS512');
 
         $this->assertEquals($token->getHeader('typ'), 'JWT');
 
@@ -72,7 +72,7 @@ class PolicierRSATest extends \PHPUnit\Framework\TestCase
 
         $token = $this->policier->decode($token);
 
-        $this->assertEquals($token['headers']['alg'], 'RS256');
+        $this->assertEquals($token['headers']['alg'], 'RS512');
 
         $this->assertEquals($token['headers']['typ'], 'JWT');
     }
