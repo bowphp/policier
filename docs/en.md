@@ -1,19 +1,22 @@
-# Policier
-
 - [Installation](#installation)
 - [Configuration](#configuration)
 - [Usage](#usage)
-  - [Set or Get configuration](#set-or-get-configuration)
-    - [Set Configuration](#set-configuration)
-    - [Get configuration](#get-configuration)
+- [Set or Get configuration](#set-or-get-configuration)
+  - [Set Configuration](#set-configuration)
+  - [Get configuration](#get-configuration)
   - [Encode Token](#encode-token)
   - [Decode Token](#decode-token)
   - [Parse Token](#parse-token)
   - [Verify Token](#verify-token)
   - [Validate Token](#validate-token)
-- [Bow and Policier](#bow-and-policier)
-  - [Personnalisation du Middleware](#personnalisation-du-middleware)
-  - [Publier le middleware](#publier-le-middleware)
+- [Bow Framework and Policier](#bow-framework-and-policier)
+  - [Customization of Middleware](#customization-of-middleware)
+  - [Publish the middleware](#publish-the-middleware)
+- [Laravel and Policier](#laravel-and-policier)
+  - [Bind Service provider](#bind-service-provider)
+  - [Bind Facade](#bind-facade)
+  - [Bind Middleware](#bind-middleware)
+  - [Using the middleware](#using-the-middleware)
 
 Policier allows to validate the request via [JWT](https://jwt.io).
 
@@ -384,7 +387,7 @@ public function middlewares()
 
 If you are using [Laravel](https://github.com/laravel/laravel), you can load the service provider `Policier\Laravel\PoliceServiceProvider::class` and bind the middleware `Policier\Laravel\PoliceMiddleware::class`. The link can be made any name, here `jwt`.
 
-### Bind Service provider:
+### Bind Service provider
 
 ```php
 "providers" => [
@@ -392,7 +395,7 @@ If you are using [Laravel](https://github.com/laravel/laravel), you can load the
 ]
 ```
 
-### Bind Facade:
+### Bind Facade
 
 ```php
 "aliases" => [
@@ -400,7 +403,7 @@ If you are using [Laravel](https://github.com/laravel/laravel), you can load the
 ]
 ```
 
-### Bind Middleware:
+### Bind Middleware
 
 ```php
 protected $routeMiddleware = [
@@ -408,7 +411,7 @@ protected $routeMiddleware = [
 ]
 ```
 
-### Using the middleware:
+### Using the middleware
 
 ```php
 Route::get('/api', function () {
