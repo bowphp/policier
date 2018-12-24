@@ -10,7 +10,11 @@ if (!function_exists('policier')) {
      */
     function policier($action = null, ...$args)
     {
-        $policier = Policier::getInstance();
+        if (class_exists(\App::class)) {
+            $policier = app('policier');
+        } else {
+            $policier = Policier::getInstance();
+        }
 
         if (is_null($action)) {
             return $policier;

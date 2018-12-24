@@ -20,7 +20,9 @@ class PolicierServiceProvider extends ServiceProvider
         );
 
         $this->app->singleton('policier', function ($app) {
-            return Policier::configure($app['config']['policier']);
+            Policier::configure($app['config']['policier']);
+
+            return Policier::getInstance();
         });
     }
     
