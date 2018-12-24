@@ -15,7 +15,7 @@ abstract class PolicierMiddlewareHandler
      */
     final public function make($request, $next)
     {
-        $bearer = $request->getHeader('Authorization');
+        $bearer = $this->getTokenHeader($request);
 
         if (is_null($bearer) || !preg_match('/^Bearer\s+(.+)/', trim($bearer), $match)) {
             return response()->json(
@@ -46,6 +46,14 @@ abstract class PolicierMiddlewareHandler
 
         return $next($request);
     }
+
+    /**
+     * Get token header
+     *
+     * @param mixed $request
+     * @return string
+     */
+    abstract protected function getTokenHeader($request);
 
     /**
      * Get Error message

@@ -18,4 +18,12 @@ class PolicierMiddleware extends \Policier\PolicierMiddlewareHandler
     {
         return $this->make($request, $next);
     }
+
+    /**
+     * @inheritdoc
+     */
+    protected function getTokenHeader($request)
+    {
+        return $request->getHeader('Authorization');
+    }
 }
