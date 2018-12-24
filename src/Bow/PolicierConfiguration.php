@@ -23,12 +23,6 @@ class PolicierConfiguration extends Configuration
         $config['policier'] = $policier;
 
         $this->container->bind('policier', function () use ($policier, $config) {
-            $name = isset($policier['middleware_name']) ? $policier['middleware_name'] : 'api';
-
-            $config->pushMiddleware([
-                $name => PolicierMiddleware::class
-            ]);
-    
             return Policier::configure($policier);
         });
     }
