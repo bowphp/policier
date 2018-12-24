@@ -3,7 +3,7 @@
     "description": "The Simple Auth System via JWT",
     "type": "library",
     "require": {
-        "lcobucci/jwt": "v3.2"
+        "lcobucci/jwt": "v3.2.5"
     },
     "autoload": {
         "psr-4": {
