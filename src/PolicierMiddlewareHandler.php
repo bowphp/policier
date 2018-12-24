@@ -13,7 +13,7 @@ abstract class PolicierMiddlewareHandler
      * @param mixed $next
      * @return mixed
      */
-    public function make($request, $next)
+    final public function make($request, $next)
     {
         $bearer = $request->getHeader('Authorization');
 
