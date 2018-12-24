@@ -4,7 +4,7 @@ namespace Policier;
 
 use Policier\Policier;
 
-abstract class PolicierMiddlewarHandler
+abstract class PolicierMiddlewareHandler
 {
     /**
      * Process Middleware

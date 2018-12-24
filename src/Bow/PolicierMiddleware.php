@@ -10,7 +10,7 @@ class PolicierMiddleware extends \Policier\PolicierMiddlewareHandler
     /**
      * Process middleware
      *
-     * @param Reqyest $request
+     * @param Request $request
      * @param callable $callable
      * @return mixed
      */

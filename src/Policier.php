@@ -89,7 +89,9 @@ class Policier
         $this->builder = new Builder;
 
         if (!isset($this->algs[$this->config['alg']])) {
-            throw new Exception\AlgorithmNotFoundException('Algorithm not found');
+            throw new Exception\AlgorithmNotFoundException(
+                $this->config['alg'] .': Algorithm not found'
+            );
         }
 
         $this->alg = new $this->algs[$this->config['alg']];
@@ -173,6 +175,12 @@ class Policier
         $alg = $this->config['alg'];
 
         if (! in_array($alg, ['RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512'])) {
+            $keystring = $this->config['signkey'];
+
+            if (is_null($keystring)) {
+                throw new Exception\InvalidSecretKeyException("You secret key is invalid.");
+            }
+
             return $this->config['signkey'];
         }
 
@@ -197,6 +205,10 @@ class Policier
     {
         if (is_file($key)) {
             return file_get_contents($key);
+        }
+
+        if (is_null($key)) {
+            throw new Exception\InvalidSecretKeyException("The special your keys path.");
         }
 
         return $key;

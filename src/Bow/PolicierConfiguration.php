@@ -1,9 +1,10 @@
 <?php
 
-namespace Policier\Jwt\Bow;
+namespace Policier\Bow;
 
 use Bow\Configuration\Configuration;
 use Bow\Configuration\Loader as Config;
+use Policier\Policier;
 
 class PolicierConfiguration extends Configuration
 {
