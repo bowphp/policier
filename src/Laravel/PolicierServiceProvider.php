@@ -19,7 +19,7 @@ class PolicierServiceProvider extends ServiceProvider
             'policier'
         );
 
-        $this->app->singleton(Policier::class, function ($app) {
+        $this->app->singleton('policier', function ($app) {
             return Policier::configure($app['config']['policier']);
         });
     }
@@ -33,7 +33,7 @@ class PolicierServiceProvider extends ServiceProvider
     {
         $this->publishes([
             __DIR__.'/../../config/policier.php' => config_path('policier.php'),
-        ]);
+        ], 'config');
     }
 
     /**
@@ -43,6 +43,6 @@ class PolicierServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return [Policier::class, 'policier'];
+        return ['policier'];
     }
 }
