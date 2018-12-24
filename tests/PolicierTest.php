@@ -19,7 +19,7 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
     /**
      * On setUp
      */
-    public function setUp()
+    public function setUp(): void
     {
         $policier = Policier::configure(
             require __DIR__.'/../config/policier.php'

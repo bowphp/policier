@@ -19,7 +19,7 @@ class PolicierRSATest extends \PHPUnit\Framework\TestCase
     /**
      * On setUp
      */
-    public function setUp()
+    public function setUp(): void
     {
         $config = require __DIR__.'/../config/policier.php';
 
