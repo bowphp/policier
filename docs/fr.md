@@ -2,7 +2,7 @@
 
 - [Installation](#installation)
 - [Configuration](#configuration)
-- [Usage](#usage)
+- [Utilisation](#utilisation)
   - [Mise à jour ou Récupération de la configuration](##mise-à-jour-ou-récupération-de-la-configuration)
     - [Mise à jour de la Configuration](#mise-à-jour-de-la-configuration)
     - [Récupération de la Configuration](#récupération-de-la-configuration)
@@ -81,21 +81,16 @@ return [
      * Chemin vers votre clé publique
      */
     "public" => null
-  ],
-    
-  /**
-   * Nom du middleware Policier
-   */
-  'middleware_name' => 'api',
+  ]
 ];
 ```
 
-## Usage
+## Utilisation
 
 Policier est très simple d'utilisation et possède une API claire. La configuration retourne une singleton.
 
 ```php
-use Bow\Jwt\Policier;
+use Policier\Policier;
 
 $configure = require "/path/to/config/file.php";
 
@@ -105,7 +100,7 @@ $policier = Policier::configure($configure);
 Vous pouvez aussi faire comme ceci:
 
 ```php
-use Bow\Jwt\Policier;
+use Policier\Policier;
 
 $configure = require "/path/to/config/file.php";
 
@@ -162,7 +157,7 @@ echo $token;
 //=> eyJ0eXAiOiJKV1QiLCJhbGciOiI6IjEifQ.eyJpc3MiOiJsb2NhbGhvc3QiLCJhdWQiOiJsb2NhbGhvc3QiLCJqdGkiOi.l7v0bS0rqnK1IeRGRBTFIH5s2TN9KtgD7BLivApq
 ```
 
-`$token` est une instance de `Bow\Jwt\Token` et implémente la méthode magique `__toString`. Vous pouvez obtenir l'heure d'expiration avec `expiredIn` et `getToken` pour prendre la valeur du token.
+`$token` est une instance de `Policier\Token` et implémente la méthode magique `__toString`. Vous pouvez obtenir l'heure d'expiration avec `expiredIn` et `getToken` pour prendre la valeur du token.
 
 Via l'assistant:
 
@@ -267,16 +262,25 @@ policier('validate', $token, $claims);
 
 ## Bow Framework et Policier
 
-Si vous utilisez [Bow Framework](https://github.com/bowphp/app), vous pouvez utiliser le plugin de configuration `Bow\Jwt\PolicierConfiguration::class` qui lie automatiquement le middleware `Bow\Jwt\PolicierMiddleware::class`. Ce middleware est utilisable via l'alias `api`.
+Si vous utilisez [Bow Framework](https://github.com/bowphp/app), vous pouvez utiliser le plugin de configuration `Policier\Bow\PolicierConfiguration::class` et le middleware `Policier\Bow\PolicierMiddleware::class`.
 
 Relier la configuration sur `app\Kernel\Loader.php`:
 
 ```php
+public function middlewares()
+{
+  return [
+    ...
+    'policier' => \Policier\Bow\PolicierMiddleware::class,
+    ...
+  ];
+}
+
 public function configurations()
 {
   return [
     ...
-    Bow\Jwt\PolicierConfiguration::class,
+    \Policier\Bow\PolicierConfiguration::class,
     ...
   ];
 }
@@ -287,29 +291,29 @@ Utilisez le middleware:
 ```php
 $app->get('/api', function () {
   $token  = policier()->getToken();
-})->middleware('api');
+})->middleware('policier');
 ```
 
-Le token a été analysé dans l'instance de Policier dans un processus middleware via la méthode `plug`. Avant l'exécution du middleware, vous pouvez:
+Le token a été analysé dans l'instance de Policier dans le processus middleware via la méthode `plug`. Après l'exécution du middleware, vous pouvez:
 
 - Obtenez le token avec `getToken`
-- Décoder le token avec `getDecodeToken` - [More information of token parsed](#decode-token)
-- Analyser le token avec `getParsedToken` - [More information of token parsed](#parse-token)
+- [Décoder](#decode-token) le token avec `getDecodeToken`
+- [Analyser](#parse-token) le token avec `getParsedToken`
 
 ### Personnalisation du Middleware
 
-Notez que vous pouvez créer un autre middleware qui étendra le middleware par defaut `Bow\Jwt\PolicierMiddleware::class`. Ce qui vous donne la possibilité de changer les messages d'erreur en surchargant les methodes `getUnauthorizedMessage`, `getExpirateMessage`, `getExpirateCode` et `getUnauthorizedCode`.
+Notez que vous pouvez créer un autre middleware qui étendra le middleware par defaut `Policier\Bow\PolicierMiddleware::class`. Ce qui vous donne la possibilité de changer les messages d'erreur en surchargant les methodes `getUnauthorizedMessage`, `getExpirateMessage`, `getExpirateCode` et `getUnauthorizedCode`.
 
 ```bash
 php bow add:middleware CustomPolicierMiddleware
 ```
 
-et ensuite vous pouvez faire ceci:
+Et ensuite vous pouvez faire ceci:
 
 ```php
 
 use Bow\Http\Request;
-use Bow\Jwt\PolicierMiddleware;
+use Policier\Bow\PolicierMiddleware;
 
 class CustomPolicierMiddleware extends PolicierMiddleware
 {
@@ -327,7 +331,7 @@ class CustomPolicierMiddleware extends PolicierMiddleware
   }
 
   /**
-   * Obtenir le message d'erreur
+   * Obtenir le message d'expiration du token
    *
    * @return array
    */
@@ -367,14 +371,116 @@ class CustomPolicierMiddleware extends PolicierMiddleware
 Pour publier le middleware personnalisé et écraser celui par defaut de Policier c'est très simple, il suffit seulement d'ajouter le middleware dans le fichier `app/Kernel/Loader.php` avec la clé `api`.
 
 ```php
-publuc function middlewares()
+public function middlewares()
 {
   return [
     ...
-    'api' => \App\Middleware\CustomPolicierMiddleware::class,
+    'policier' => \App\Middleware\CustomPolicierMiddleware::class,
     ...
   ];
 }
 ```
+
+## Laravel et Policier
+
+Si vous utilisez [Laravel](https://github.com/laravel/laravel), vous pouvez charger le service provider `Policier\Laravel\PolicierServiceProvider::class` et lié le middleware `Policier\Laravel\PolicierMiddleware::class`. La liaison peut être faire n'import quel nom, ici `jwt`.
+
+### Publier le Service provider de Policier:
+
+```php
+"providers" => [
+  \Policier\Laravel\PolicierServiceProvider::class,
+]
+```
+
+### Publier la Facade de Policier:
+
+```php
+"aliases" => [
+  'Policier' => \Policier\Laravel\Policier::class,
+]
+```
+
+### Publier le Middleware de Policer:
+
+```php
+protected $routeMiddleware = [
+  'policier' => \Policier\Laravel\PolicierMiddleware::class,
+]
+```
+
+### Utilisation du middleware:
+
+```php
+Route::get('/api', function () {
+  $token = policier()->getToken();
+})->middleware('jwt');
+```
+
+> Vous pouvez aussi modifer les messages d'erreurs et code http de ces message en etendant le middleware comme nous avons faire avec Bow Framework.
+
+```bash
+php artisan make:middleware CustomPolicierMiddleware
+```
+
+et ensuite vous pouvez faire ceci:
+
+```php
+namespace App\Http\Middleware;
+
+use Policier\Laravel\PolicierMiddleware;
+
+class CustomPolicierMiddleware extends PolicierMiddleware
+{
+  /**
+   * Obtenir le message d'erreur
+   *
+   * @return array
+   */
+  public function getUnauthorizedMessage()
+  {
+    return [
+      'message' => 'unauthorized',
+      'error' => true
+    ];
+  }
+
+  /**
+   * Obtenir le message d'expiration du token
+   *
+   * @return array
+   */
+  public function getExpirationMessage()
+  {
+    return [
+      'message' => 'token is expired',
+      'expired' => true,
+      'error' => true
+    ];
+  }
+
+  /**
+   * Obtenir le code de réponse non autorisé
+   *
+   * @return int
+   */
+  public function getUnauthorizedStatusCode()
+  {
+    return 403;
+  }
+
+  /**
+   * Obtenir le code de réponse
+   *
+   * @return int
+   */
+  public function getExpirationStatusCode()
+  {
+    return 403;
+  }
+}
+```
+
+Vous devez publier le middleware dans le fichier `app\Http\Kernel.php`.
 
 > N'hésitez pas à donner votre avis sur la qualité de la documentation ou proposez des correctifs.

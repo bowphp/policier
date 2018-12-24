@@ -81,12 +81,7 @@ return [
      * Path to your public key
      */
     "public" => null
-  ],
-  
-  /**
-   * Policier middleware name
-   */
-  'middleware_name' => 'api',
+  ]
 ];
 ```
 
@@ -95,7 +90,7 @@ return [
 Policier is very easy to use and has a clear API. The configuration returns a singleton.
 
 ```php
-use Bow\Jwt\Policier;
+use Policier\Policier;
 
 $configure = require "/path/to/config/file.php";
 
@@ -105,7 +100,7 @@ $policier = Policier::configure($configure);
 You can also do like this:
 
 ```php
-use Bow\Jwt\Policier;
+use Policier\Policier;
 
 $configure = require "/path/to/config/file.php";
 
@@ -162,7 +157,7 @@ echo $token;
 //=> eyJ0eXAiOiJKV1QiLCJhbGciOiI6IjEifQ.eyJpc3MiOiJsb2NhbGhvc3QiLCJhdWQiOiJsb2NhbGhvc3QiLCJqdGkiOi.l7v0bS0rqnK1IeRGRBTFIH5s2TN9KtgD7BLivApq
 ```
 
-`$ token` is an instance of `Bow\Jwt\Token` and implements the `__toString` magic method. You can get the expiration time with `expiredIn` and ` getToken` to take the value of the token.
+`$ token` is an instance of `Policier\Token` and implements the `__toString` magic method. You can get the expiration time with `expiredIn` and ` getToken` to take the value of the token.
 
 Via helper:
 
@@ -267,16 +262,25 @@ policier('validate', $token, $claims);
 
 ## Bow Framework and Policier
 
-If you're using [Bow Framework](https://github.com/bowphp/app), you can use the `Bow\Jwt\PoliceConfiguration::class` configuration plugin that automatically binds the `Bow\Jwt\PoliceMiddleware::class`. This middleware is usable via the `api` alias.
+If you're using [Bow Framework](https://github.com/bowphp/app), you can use the `Policier\Bow\PolicierConfiguration::class` and `Policier\Bow\PolicierMiddleware::class` middleware.
 
 Connect the configuration on `app\Kernel\Loader.php`:
 
 ```php
+public function middlewares()
+{
+  return [
+    ...
+    'policier' => \Policier\Bow\PolicierMiddleware::class,
+    ...
+  ];
+}
+
 public function configurations()
 {
   return [
     ...
-    Bow\Jwt\PolicierConfiguration::class,
+    \Policier\Bow\PolicierConfiguration::class,
     ...
   ];
 }
@@ -287,34 +291,33 @@ Use the middleware:
 ```php
 $app->get('/api', function () {
   $token  = policier()->getToken();
-})->middleware('api');
+})->middleware('policier');
 ```
 
 The token was parsed in the instance of Police in a middleware process via the `plug` method. Before running the middleware, you can:
 
 - Get the token with `getToken`
-- Decode the token with `getDecodeToken` - [More info of token parsed](#decode-token)
-- Analyze the token with `getParsedToken` - [More info of token parsed](#parse-token)
+- [Decode](#decode-token) the token with `getDecodeToken`
+- [Analyze](#parse-token) the token with `getParsedToken`
 
 ### Customization of Middleware
 
-Note that you can create another middleware that will extend the default middleware to `Bow\Jwt\PoliceMiddleware::class`. This gives you the ability to change error messages by overriding the `getUnauthorizedMessage`,` getExpirateMessage`, `getExpirateCode`, and` getUnauthorizedCode` methods.
+Note that you can create another middleware that will extend the default middleware to `Policier\Bow\PolicierMiddleware::class`. This gives you the ability to change error messages by overriding the `getUnauthorizedMessage`,` getExpirateMessage`, `getExpirateCode`, and` getUnauthorizedCode` methods.
 
 ```bash
 php bow add:middleware CustomPolicierMiddleware
 ```
 
-and then you can do this:
+And then you can do this:
 
 ```php
-
 use Bow\Http\Request;
-use Bow\Jwt\PolicierMiddleware;
+use Policier\Bow\PolicierMiddleware;
 
 class CustomPolicierMiddleware extends PolicierMiddleware
 {
   /**
-   * Get Error message
+   * Get the error message
    *
    * @return array
    */
@@ -327,7 +330,7 @@ class CustomPolicierMiddleware extends PolicierMiddleware
   }
 
   /**
-   * Get Error message
+   * Get the expiration message
    *
    * @return array
    */
@@ -367,14 +370,116 @@ class CustomPolicierMiddleware extends PolicierMiddleware
 To publish the custom middleware and overwrite the default one of Police is very simple, just add the middleware in the file `app/Kernel/Loader.php` with the key` api`.
 
 ```php
-publuc function middlewares()
+public function middlewares()
 {
   return [
     ...
-    'api' => \App\Middleware\CustomPolicierMiddleware::class,
+    'policier' => \App\Middleware\CustomPolicierMiddleware::class,
     ...
   ];
 }
 ```
+
+## Laravel and Policier
+
+If you are using [Laravel](https://github.com/laravel/laravel), you can load the service provider `Policier\Laravel\PoliceServiceProvider::class` and bind the middleware `Policier\Laravel\PoliceMiddleware::class`. The link can be made any name, here `jwt`.
+
+### Bind Service provider:
+
+```php
+"providers" => [
+  \Policier\Laravel\PolicierServiceProvider::class,
+]
+```
+
+### Bind Facade:
+
+```php
+"aliases" => [
+  'Policier' => \Policier\Laravel\Policier::class,
+]
+```
+
+### Bind Middleware:
+
+```php
+protected $routeMiddleware = [
+  'policier' => \Policier\Laravel\PolicierMiddleware::class,
+]
+```
+
+### Using the middleware:
+
+```php
+Route::get('/api', function () {
+  $token = policier()->getToken();
+})->middleware('jwt');
+```
+
+> You can also modify the error messages and http code of these messages by extending the middleware as we did with the Bow Framework.
+
+```bash
+php artisan make:middleware CustomPolicierMiddleware
+```
+
+and then you can do this:
+
+```php
+namespace App\Http\Middleware;
+
+use Policier\Laravel\PolicierMiddleware;
+
+class CustomPolicierMiddleware extends PolicierMiddleware
+{
+  /**
+   * Get the error message
+   *
+   * @return array
+   */
+  public function getUnauthorizedMessage()
+  {
+    return [
+      'message' => 'unauthorized',
+      'error' => true
+    ];
+  }
+
+  /**
+   * Get the expiration message
+   *
+   * @return array
+   */
+  public function getExpirationMessage()
+  {
+    return [
+      'message' => 'token is expired',
+      'expired' => true,
+      'error' => true
+    ];
+  }
+
+  /**
+   * Get the unauthorized response code
+   *
+   * @return int
+   */
+  public function getUnauthorizedStatusCode()
+  {
+    return 403;
+  }
+
+  /**
+   * Get the answer code
+   *
+   * @return int
+   */
+  public function getExpirationStatusCode()
+  {
+    return 403;
+  }
+}
+```
+
+You must publish the middleware in the `app\Http\Kernel.php` file.
 
 > Feel free to give your opinion on the quality of the documentation or suggest corrections.
