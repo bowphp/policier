@@ -1,6 +1,6 @@
 {
-    "name": "policier/policier",
-    "description": "The authicate system",
+    "name": "bowphp/policier",
+    "description": "The Simple Auth System via JWT",
     "type": "library",
     "require": {
         "lcobucci/jwt": "v3.2"
