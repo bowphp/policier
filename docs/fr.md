@@ -10,13 +10,13 @@
   - [Vérifier un Token](#v%C3%A9rifier-un-token)
   - [Valider un Token](#valider-un-token)
 - [Bow Framework et Policier](#bow-framework-et-policier)
-    - [Personnalisation du Middleware](#personnalisation-du-middleware)
+  - [Personnalisation du Middleware](#personnalisation-du-middleware)
     - [Publier le middleware](#publier-le-middleware)
 - [Laravel et Policier](#laravel-et-policier)
-    - [Publier le Service provider de Policier:](#publier-le-service-provider-de-policier)
-    - [Publier la Facade de Policier:](#publier-la-facade-de-policier)
-    - [Publier le Middleware de Policer:](#publier-le-middleware-de-policer)
-  - [Utilisation du middleware:](#utilisation-du-middleware)
+  - [Publier le Service provider de Policier](#publier-le-service-provider-de-policier)
+  - [Publier la Facade de Policier](#publier-la-facade-de-policier)
+  - [Publier le Middleware de Policer](#publier-le-middleware-de-policer)
+  - [Utilisation du middleware](#utilisation-du-middleware)
 
 La police permet de valider la demande via [JWT](https://jwt.io)
 
@@ -303,7 +303,7 @@ Le token a été analysé dans l'instance de Policier dans le processus middlewa
 - [Décoder](#decode-token) le token avec `getDecodeToken`
 - [Analyser](#parse-token) le token avec `getParsedToken`
 
-#### Personnalisation du Middleware
+### Personnalisation du Middleware
 
 Notez que vous pouvez créer un autre middleware qui étendra le middleware par defaut `Policier\Bow\PolicierMiddleware::class`. Ce qui vous donne la possibilité de changer les messages d'erreur en surchargant les methodes `getUnauthorizedMessage`, `getExpirateMessage`, `getExpirateCode` et `getUnauthorizedCode`.
 
@@ -388,7 +388,7 @@ public function middlewares()
 
 Si vous utilisez [Laravel](https://github.com/laravel/laravel), vous pouvez charger le service provider `Policier\Laravel\PolicierServiceProvider::class` et lié le middleware `Policier\Laravel\PolicierMiddleware::class`. La liaison peut être faire n'import quel nom, ici `jwt`.
 
-#### Publier le Service provider de Policier:
+### Publier le Service provider de Policier
 
 ```php
 "providers" => [
@@ -396,7 +396,7 @@ Si vous utilisez [Laravel](https://github.com/laravel/laravel), vous pouvez char
 ]
 ```
 
-#### Publier la Facade de Policier:
+### Publier la Facade de Policier
 
 ```php
 "aliases" => [
@@ -404,7 +404,7 @@ Si vous utilisez [Laravel](https://github.com/laravel/laravel), vous pouvez char
 ]
 ```
 
-#### Publier le Middleware de Policer:
+### Publier le Middleware de Policer
 
 ```php
 protected $routeMiddleware = [
@@ -412,7 +412,7 @@ protected $routeMiddleware = [
 ]
 ```
 
-### Utilisation du middleware:
+### Utilisation du middleware
 
 ```php
 Route::get('/api', function () {
