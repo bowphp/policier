@@ -18,7 +18,7 @@
   - [Publier le Middleware de Policer](#publier-le-middleware-de-policer)
   - [Utilisation du middleware](#utilisation-du-middleware)
 
-La police permet de valider la demande via [JWT](https://jwt.io)
+Policier permet de valider la demande via [JWT](https://jwt.io)
 
 ## Installation
 
