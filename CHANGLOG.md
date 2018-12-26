@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.0.1] - 2018-12-26
+
+- [fix] update php version for travis config
+- [change] remove auto plug middleware
+
 ## [2.0.0] - 2018-12-20
 
 - [Fix] Many bug fixed: RSA support
