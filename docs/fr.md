@@ -417,7 +417,7 @@ protected $routeMiddleware = [
 ```php
 Route::get('/api', function () {
   $token = policier()->getToken();
-})->middleware('jwt');
+})->middleware('policier');
 ```
 
 > Vous pouvez aussi modifer les messages d'erreurs et code http de ces message en etendant le middleware comme nous avons faire avec Bow Framework.
