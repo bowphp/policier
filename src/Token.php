@@ -5,11 +5,15 @@ namespace Policier;
 final class Token
 {
     /**
+     * The token
+     *
      * @var string
      */
     private $token;
 
     /**
+     * The expiration time
+     *
      * @var int
      */
     private $expired_in;
@@ -19,6 +23,8 @@ final class Token
      *
      * @param string $token
      * @param int $expired_in
+     *
+     * @return void
      */
     public function __construct($token, $expired_in)
     {

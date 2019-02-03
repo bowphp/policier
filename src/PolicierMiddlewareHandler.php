@@ -11,6 +11,7 @@ abstract class PolicierMiddlewareHandler
      *
      * @param mixed $request
      * @param mixed $next
+     *
      * @return mixed
      */
     final public function make($request, $next)
@@ -51,6 +52,7 @@ abstract class PolicierMiddlewareHandler
      * Get token header
      *
      * @param mixed $request
+     *
      * @return string
      */
     abstract protected function getTokenHeader($request);

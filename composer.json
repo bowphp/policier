@@ -2,6 +2,7 @@
     "name": "bowphp/policier",
     "description": "The Simple Auth System via JWT",
     "type": "library",
+    "keywords": ["JWT", "Json Web Token", "Policier", "Franck DAKIA", "Policier PHP", "PHP JWT", "FranckDakia", "Papac"],
     "require": {
         "lcobucci/jwt": "v3.2.5"
     },

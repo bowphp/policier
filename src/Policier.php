@@ -81,6 +81,8 @@ class Policier
      * Policier constructor
      *
      * @param array $config
+     *
+     * @return void
      */
     private function __construct(array $config)
     {
@@ -105,6 +107,8 @@ class Policier
      * Configuration
      *
      * @param array $config
+     *
+     * @return void
      */
     public static function configure(array $config)
     {
@@ -129,6 +133,8 @@ class Policier
      * Plug token
      *
      * @param string $token
+     *
+     * @return void
      */
     public function plug($token)
     {
@@ -199,6 +205,7 @@ class Policier
      * Get key content
      *
      * @param string $key
+     *
      * @return string
      */
     private function getKeyContents($key)
@@ -228,6 +235,7 @@ class Policier
      * Update config
      *
      * @param array $config
+     *
      * @return mixed
      */
     public function setConfig(array $config)
@@ -241,6 +249,7 @@ class Policier
      * Get Config
      *
      * @param string $key
+     *
      * @return mixed
      */
     public function getConfig($key)
@@ -253,6 +262,7 @@ class Policier
      *
      * @param mixed $id
      * @param array $claims
+     *
      * @return string
      */
     public function encode($id, array $claims)
@@ -294,6 +304,7 @@ class Policier
      * Decode token
      *
      * @param string $token
+     *
      * @return array
      */
     public function decode($token)
@@ -319,6 +330,7 @@ class Policier
      * Verify token
      *
      * @param string $token
+     *
      * @return bool
      */
     public function verify($token)
@@ -335,6 +347,7 @@ class Policier
      * Parse token
      *
      * @param string $token
+     *
      * @return Token
      */
     public function parse($token)
@@ -348,6 +361,7 @@ class Policier
      *
      * @param string $token
      * @param array $claims
+     *
      * @return bool
      */
     public function validate($token, $id, array $claims)
@@ -372,6 +386,7 @@ class Policier
      * Check if token is expired
      *
      * @param string $token
+     *
      * @return bool
      */
     public function isExpired($token)
@@ -386,6 +401,7 @@ class Policier
      *
      * @param string $method
      * @param array $args
+     *
      * @return mixed
      */
     public static function __callStatic($method, $args)

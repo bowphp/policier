@@ -12,6 +12,7 @@ class PolicierMiddleware extends \Policier\PolicierMiddlewareHandler
      *
      * @param Request $request
      * @param callable $callable
+     *
      * @return mixed
      */
     final public function process(Request $request, callable $next)
