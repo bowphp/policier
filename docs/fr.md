@@ -153,7 +153,7 @@ $claims = [
 
 $token = $policier->encode($id, $claims);
 
-$token->expiredIn(); // Expired In
+$token->expireIn(); // Expired In
 $token->getToken(); // Token value
 
 echo $token;
