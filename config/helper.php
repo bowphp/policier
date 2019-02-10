@@ -5,7 +5,9 @@ use Policier\Policier;
 if (!function_exists('policier')) {
     /**
      * Policier Helper
-     *
+     * 
+     * @param string $action
+     * @param array $args
      * @return Policier
      */
     function policier($action = null, ...$args)
