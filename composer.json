@@ -21,7 +21,7 @@
             "email": "dakiafranck@gmail.com"
         }
     ],
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "require-dev": {
         "phpunit/phpunit": "^7"
     },
