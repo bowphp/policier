@@ -2,6 +2,7 @@
 
 namespace Policier;
 
+use Bow\Http\Request;
 use Policier\Policier;
 
 abstract class PolicierMiddlewareHandler
@@ -9,12 +10,11 @@ abstract class PolicierMiddlewareHandler
     /**
      * Process Middleware
      *
-     * @param mixed $request
-     * @param mixed $next
-     *
+     * @param Request $request
+     * @param callable $next
      * @return mixed
      */
-    final public function make($request, $next)
+    final public function process(Request $request, callable $next)
     {
         $bearer = $this->getTokenHeader($request);
 
@@ -51,11 +51,10 @@ abstract class PolicierMiddlewareHandler
     /**
      * Get token header
      *
-     * @param mixed $request
-     *
+     * @param Request $request
      * @return string
      */
-    abstract protected function getTokenHeader($request);
+    abstract protected function getTokenHeader(Request $request);
 
     /**
      * Get Error message
@@ -65,7 +64,7 @@ abstract class PolicierMiddlewareHandler
     public function getUnauthorizedMessage()
     {
         return [
-            'message' => 'unauthorized',
+            'message' => 'Unauthorized',
             'error' => true
         ];
     }
@@ -78,14 +77,14 @@ abstract class PolicierMiddlewareHandler
     public function getExpirationMessage()
     {
         return [
-            'message' => 'token is expired',
+            'message' => 'Token is expired',
             'expired' => true,
             'error' => true
         ];
     }
 
     /**
-     * Get Expirate response code
+     * Get Expire response code
      *
      * @return int
      */

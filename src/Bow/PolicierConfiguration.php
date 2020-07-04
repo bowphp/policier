@@ -23,6 +23,10 @@ class PolicierConfiguration extends Configuration
         $config['policier'] = $policier;
 
         $this->container->bind('policier', function () use ($policier, $config) {
+            if (is_null($policier['signkey']) && is_null($policier['keychain']['private'])) {
+                $policier['signkey'] = file_get_contents($config['security.key']);
+            }
+            
             return Policier::configure($policier);
         });
     }
