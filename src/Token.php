@@ -19,7 +19,7 @@ final class Token
     private $expired_in;
 
     /**
-     * Token contructor
+     * Token constructor
      *
      * @param string $token
      * @param int $expired_in
@@ -61,5 +61,18 @@ final class Token
     public function __toString()
     {
         return $this->token;
+    }
+
+    /**
+     * Transform token to array
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return [
+            'access_token' => $this->token,
+            'expired_in' => $this->expired_in,
+        ];
     }
 }

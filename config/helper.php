@@ -1,6 +1,7 @@
 <?php
 
 use Policier\Policier;
+use Policier\Token;
 
 if (!function_exists('policier')) {
     /**
@@ -8,7 +9,7 @@ if (!function_exists('policier')) {
      * 
      * @param string $action
      * @param array $args
-     * @return Policier
+     * @return Policier|Token
      */
     function policier($action = null, ...$args)
     {

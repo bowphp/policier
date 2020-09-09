@@ -37,7 +37,7 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
         $this->policier = Policier::getInstance();
     }
 
-    public function testEncode()
+    public function testShouldEncodeData()
     {
         $id = 1;
         
@@ -62,9 +62,9 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @depends testEncode
+     * @depends testShouldEncodeData
      */
-    public function testDecode()
+    public function testShouldDecodeData()
     {
         $token = $this->readToFile();
 
@@ -78,9 +78,9 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @depends testDecode
+     * @depends testShouldDecodeData
      */
-    public function testHelperEncode()
+    public function testShouldEncodeViaHelper()
     {
         $token = policier('encode', $id = 1, [
             'name' => 'policier'
@@ -96,9 +96,25 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
+     * @depends testShouldDecodeData
+     */
+    public function testTransformTokenToArray()
+    {
+        $token = policier('encode', $id = 1, [
+            'name' => 'policier'
+        ]);
+
+        $this->assertInstanceOf(\Policier\Token::class, $token);
+
+        $array = $token->toArray();
+
+        $this->assertArrayHasKey($array, ['access_token', 'expired_in']);
+    }
+
+    /**
      * @depends testHelperEncode
      */
-    public function testHelperDecode()
+    public function testShouldDecodeViaHelper()
     {
         $token = $this->readToFile();
 
