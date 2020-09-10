@@ -108,11 +108,12 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
 
         $array = $token->toArray();
 
-        $this->assertArrayHasKey($array, ['access_token', 'expired_in']);
+        $this->assertArrayHasKey('access_token', $array);
+        $this->assertArrayHasKey('expired_in', $array);
     }
 
     /**
-     * @depends testHelperEncode
+     * @depends testShouldEncodeData
      */
     public function testShouldDecodeViaHelper()
     {
