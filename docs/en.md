@@ -324,12 +324,9 @@ class CustomPolicierMiddleware extends PolicierMiddleware
    *
    * @return array
    */
-  public function getUnauthorizedMessage()
+  public function getInvalidMessage()
   {
-    return [
-      'message' => 'unauthorized',
-      'error' => true
-    ];
+    return 'unauthorized';
   }
 
   /**
@@ -339,38 +336,14 @@ class CustomPolicierMiddleware extends PolicierMiddleware
    */
   public function getExpirationMessage()
   {
-    return [
-      'message' => 'token is expired',
-      'expired' => true,
-      'error' => true
-    ];
-  }
-
-  /**
-   * Get Unauthorized response code
-   *
-   * @return int
-   */
-  public function getUnauthorizedStatusCode()
-  {
-    return 403;
-  }
-
-  /**
-   * Get Expirate response code
-   *
-   * @return int
-   */
-  public function getExpirationStatusCode()
-  {
-    return 403;
+    return 'Token is expired';
   }
 }
 ```
 
 ### Publish the middleware
 
-To publish the custom middleware and overwrite the default one of Police is very simple, just add the middleware in the file `app/Kernel/Loader.php` with the key` api`.
+To publish the custom middleware and overwrite the default one of Police is very simple, just add the middleware in the file `app/Kernel.php` with the key `api`.
 
 ```php
 public function middlewares()
@@ -423,64 +396,6 @@ Route::get('/api', function () {
 
 ```bash
 php artisan make:middleware CustomPolicierMiddleware
-```
-
-and then you can do this:
-
-```php
-namespace App\Http\Middleware;
-
-use Policier\Laravel\PolicierMiddleware;
-
-class CustomPolicierMiddleware extends PolicierMiddleware
-{
-  /**
-   * Get the error message
-   *
-   * @return array
-   */
-  public function getUnauthorizedMessage()
-  {
-    return [
-      'message' => 'unauthorized',
-      'error' => true
-    ];
-  }
-
-  /**
-   * Get the expiration message
-   *
-   * @return array
-   */
-  public function getExpirationMessage()
-  {
-    return [
-      'message' => 'token is expired',
-      'expired' => true,
-      'error' => true
-    ];
-  }
-
-  /**
-   * Get the unauthorized response code
-   *
-   * @return int
-   */
-  public function getUnauthorizedStatusCode()
-  {
-    return 403;
-  }
-
-  /**
-   * Get the answer code
-   *
-   * @return int
-   */
-  public function getExpirationStatusCode()
-  {
-    return 403;
-  }
-}
 ```
 
 You must publish the middleware in the `app\Http\Kernel.php` file.
