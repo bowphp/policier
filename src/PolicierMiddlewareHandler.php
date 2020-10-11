@@ -2,7 +2,8 @@
 
 namespace Policier;
 
-use Bow\Http\Request;
+use Policier\Exception\TokenExpiredException;
+use Policier\Exception\TokenInvalidException;
 use Policier\Policier;
 
 abstract class PolicierMiddlewareHandler
@@ -10,19 +11,15 @@ abstract class PolicierMiddlewareHandler
     /**
      * Process Middleware
      *
-     * @param Request $request
      * @param callable $next
      * @return mixed
      */
-    final public function process(Request $request, callable $next)
+    public function make($request, callable $next)
     {
         $bearer = $this->getTokenHeader($request);
 
         if (is_null($bearer) || !preg_match('/^Bearer\s+(.+)/', trim($bearer), $match)) {
-            return response()->json(
-                $this->getUnauthorizedMessage(),
-                $this->getUnauthorizedStatusCode()
-            );
+            throw new TokenInvalidException($this->getExpirationMessage());
         }
 
         $token = trim(end($match));
@@ -30,17 +27,11 @@ abstract class PolicierMiddlewareHandler
         $policier = Policier::getInstance();
 
         if (!$policier->verify($token)) {
-            return response()->json(
-                $this->getUnauthorizedMessage(),
-                $this->getUnauthorizedStatusCode()
-            );
+            throw new TokenInvalidException($this->getInvalidMessage());
         }
 
         if ($policier->isExpired($token)) {
-            return response()->json(
-                $this->getExpirationMessage(),
-                $this->getExpirationStatusCode()
-            );
+            throw new TokenExpiredException($this->getExpirationMessage());
         }
 
         $policier->plug($token);
@@ -51,55 +42,28 @@ abstract class PolicierMiddlewareHandler
     /**
      * Get token header
      *
-     * @param Request $request
+     * @param mixed $request
      * @return string
      */
-    abstract protected function getTokenHeader(Request $request);
+    abstract protected function getTokenHeader($request);
 
     /**
-     * Get Error message
+     * Get Expiration message
      *
-     * @return array
-     */
-    public function getUnauthorizedMessage()
-    {
-        return [
-            'message' => 'Unauthorized',
-            'error' => true
-        ];
-    }
-
-    /**
-     * Get Error message
-     *
-     * @return array
+     * @return string
      */
     public function getExpirationMessage()
     {
-        return [
-            'message' => 'Token is expired',
-            'expired' => true,
-            'error' => true
-        ];
+        return 'Token is expired';
     }
 
     /**
-     * Get Expire response code
+     * Get Invalid message
      *
-     * @return int
+     * @return string
      */
-    public function getExpirationStatusCode()
+    public function getInvalidMessage()
     {
-        return 403;
-    }
-
-    /**
-     * Get Unauthorized response code
-     *
-     * @return int
-     */
-    public function getUnauthorizedStatusCode()
-    {
-        return 403;
+        return "Token is invalid";
     }
 }
