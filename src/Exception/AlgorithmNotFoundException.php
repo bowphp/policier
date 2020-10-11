@@ -2,7 +2,9 @@
 
 namespace Policier\Exception;
 
-class AlgorithmNotFoundException extends \Exception
+use Exception;
+
+class AlgorithmNotFoundException extends Exception
 {
 
 }

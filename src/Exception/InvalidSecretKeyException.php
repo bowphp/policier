@@ -2,7 +2,9 @@
 
 namespace Policier\Exception;
 
-class InvalidSecretKeyException extends \Exception
+use Exception;
+
+class InvalidSecretKeyException extends Exception
 {
 
 }

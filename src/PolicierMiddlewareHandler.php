@@ -40,14 +40,6 @@ abstract class PolicierMiddlewareHandler
     }
 
     /**
-     * Get token header
-     *
-     * @param mixed $request
-     * @return string
-     */
-    abstract protected function getTokenHeader($request);
-
-    /**
      * Get Expiration message
      *
      * @return string
@@ -66,4 +58,12 @@ abstract class PolicierMiddlewareHandler
     {
         return "Token is invalid";
     }
+
+    /**
+     * Get token header
+     *
+     * @param mixed $request
+     * @return string
+     */
+    abstract protected function getTokenHeader($request);
 }

@@ -2,6 +2,8 @@
 
 namespace Policier\Laravel;
 
+use Illuminate\Http\Request;
+
 class PolicierMiddleware extends \Policier\PolicierMiddlewareHandler
 {
     /**
