@@ -3,6 +3,7 @@
 namespace Policier\Bow;
 
 use Bow\Http\Request;
+use Policier\Exception\TokenInvalidException;
 
 class PolicierMiddleware extends \Policier\PolicierMiddlewareHandler
 {
@@ -24,6 +25,22 @@ class PolicierMiddleware extends \Policier\PolicierMiddlewareHandler
      */
     protected function getTokenHeader($request)
     {
-        return $request->getHeader('Authorization');
+        $token = $request->getHeader('Authorization');
+
+        if (is_null($token)) {
+            $token = $request->getHeader('X-Authorization');
+
+            if (is_null($token)) {
+                $token = $request->getHeader('X-Policier-Authorization');
+            }
+        }
+
+        if (is_null($token)) {
+            throw new TokenInvalidException(
+                "The token header is not valid. Possible values (X-Policier-Authorization, X-Authorization, Authorization)"
+            );
+        }
+
+        return $token;
     }
 }
