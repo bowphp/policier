@@ -11,7 +11,7 @@ class PolicierConfiguration extends Configuration
     /**
      * @inheritdoc
      */
-    public function create(Config $config)
+    public function create(Config $config): void
     {
         $policier = (array) $config['policier'];
 
@@ -34,7 +34,7 @@ class PolicierConfiguration extends Configuration
     /**
      * @inheritdoc
      */
-    public function run()
+    public function run(): void
     {
         $this->container->make('policier');
     }

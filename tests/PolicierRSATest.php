@@ -51,13 +51,9 @@ class PolicierRSATest extends \PHPUnit\Framework\TestCase
         $token = $this->policier->parse($this->token);
 
         $this->assertEquals($token->getHeader('alg'), 'RS512');
-
         $this->assertEquals($token->getHeader('typ'), 'JWT');
-
         $this->assertEquals($token->getClaim('username'), 'papac');
-
         $this->assertTrue($token->getClaim('logged'));
-
         $this->writeToFile($this->token);
     }
 
@@ -67,13 +63,10 @@ class PolicierRSATest extends \PHPUnit\Framework\TestCase
     public function testDecode()
     {
         $token = $this->readToFile();
-
         $this->assertTrue($this->policier->verify($token));
 
         $token = $this->policier->decode($token);
-
         $this->assertEquals($token['headers']['alg'], 'RS512');
-
         $this->assertEquals($token['headers']['typ'], 'JWT');
     }
 

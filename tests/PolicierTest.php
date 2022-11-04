@@ -49,15 +49,10 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
         $this->assertTrue($this->policier->verify($this->token));
 
         $token = $this->policier->parse($this->token);
-
         $this->assertEquals($token->getHeader('alg'), 'HS512');
-
         $this->assertEquals($token->getHeader('typ'), 'JWT');
-
         $this->assertEquals($token->getClaim('username'), 'papac');
-
         $this->assertTrue($token->getClaim('logged'));
-
         $this->writeToFile($this->token);
     }
 

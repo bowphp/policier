@@ -15,7 +15,7 @@ class PolicierMiddleware extends \Policier\PolicierMiddlewareHandler
      *
      * @return mixed
      */
-    public function process(Request $request, callable $next)
+    public function process(Request $request, callable $next): mixed
     {
         return $this->make($request, $next);
     }
@@ -23,7 +23,7 @@ class PolicierMiddleware extends \Policier\PolicierMiddlewareHandler
     /**
      * @inheritdoc
      */
-    protected function getTokenHeader($request)
+    protected function getTokenHeader($request): string
     {
         $token = $request->getHeader('Authorization');
 
