@@ -15,7 +15,7 @@ class PolicierServiceProvider extends ServiceProvider
     public function register()
     {
         $this->mergeConfigFrom(
-            __DIR__.'/../../config/policier.php',
+            __DIR__ . '/../../config/policier.php',
             'policier'
         );
 
@@ -25,7 +25,7 @@ class PolicierServiceProvider extends ServiceProvider
             return Policier::getInstance();
         });
     }
-    
+
     /**
      * Bootstrap any application services.
      *
@@ -34,7 +34,7 @@ class PolicierServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->publishes([
-            __DIR__.'/../../config/policier.php' => config_path('policier.php'),
+            __DIR__ . '/../../config/policier.php' => config_path('policier.php'),
         ], 'config');
     }
 

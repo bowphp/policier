@@ -21,7 +21,7 @@ class PolicierRSATest extends \PHPUnit\Framework\TestCase
      */
     public function setUp(): void
     {
-        $config = require __DIR__.'/../config/policier.php';
+        $config = require __DIR__ . '/../config/policier.php';
 
         $policier = Policier::configure($config);
 
@@ -29,8 +29,8 @@ class PolicierRSATest extends \PHPUnit\Framework\TestCase
             'singkey' => null,
             'alg' => 'RS512',
             'keychain' => [
-                'private' => trim(file_get_contents(__DIR__.'/seeds/rsa/private.key')),
-                'public' => trim(file_get_contents(__DIR__.'/seeds/rsa/public.key')),
+                'private' => trim(file_get_contents(__DIR__ . '/seeds/rsa/private.key')),
+                'public' => trim(file_get_contents(__DIR__ . '/seeds/rsa/public.key')),
             ],
         ]);
 
@@ -40,7 +40,7 @@ class PolicierRSATest extends \PHPUnit\Framework\TestCase
     public function testEncode()
     {
         $id = 1;
-        
+
         $this->token = $this->policier->encode($id, [
             'username' => "papac",
             'logged' => true
@@ -109,7 +109,7 @@ class PolicierRSATest extends \PHPUnit\Framework\TestCase
      */
     public function writeToFile($token)
     {
-        file_put_contents(sys_get_temp_dir().'/testing', (string) $token);
+        file_put_contents(sys_get_temp_dir() . '/testing', (string) $token);
     }
 
     /**
@@ -119,6 +119,6 @@ class PolicierRSATest extends \PHPUnit\Framework\TestCase
      */
     public function readToFile()
     {
-        return trim(file_get_contents(sys_get_temp_dir().'/testing'));
+        return trim(file_get_contents(sys_get_temp_dir() . '/testing'));
     }
 }

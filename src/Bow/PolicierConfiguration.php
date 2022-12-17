@@ -16,7 +16,7 @@ class PolicierConfiguration extends Configuration
         $policier = (array) $config['policier'];
 
         $policier = array_merge(
-            require __DIR__.'/../../config/policier.php',
+            require __DIR__ . '/../../config/policier.php',
             $policier
         );
 
@@ -26,7 +26,7 @@ class PolicierConfiguration extends Configuration
             if (is_null($policier['signkey']) && is_null($policier['keychain']['private'])) {
                 $policier['signkey'] = file_get_contents($config['security.key']);
             }
-            
+
             return Policier::configure($policier);
         });
     }

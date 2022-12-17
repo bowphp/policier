@@ -22,12 +22,12 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
     public function setUp(): void
     {
         $policier = Policier::configure(
-            require __DIR__.'/../config/policier.php'
+            require __DIR__ . '/../config/policier.php'
         );
 
         $policier->setConfig([
             'alg' => 'HS512',
-            'signkey' => trim(file_get_contents(__DIR__.'/seeds/keystring')),
+            'signkey' => trim(file_get_contents(__DIR__ . '/seeds/keystring')),
             'keychain' => [
                 'private' => null,
                 'public' => null,
@@ -40,7 +40,7 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
     public function testShouldEncodeData()
     {
         $id = 1;
-        
+
         $this->token = $this->policier->encode($id, [
             'username' => "papac",
             'logged' => true
@@ -128,7 +128,7 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
      */
     public function writeToFile($token)
     {
-        file_put_contents(sys_get_temp_dir().'/testing', (string) $token);
+        file_put_contents(sys_get_temp_dir() . '/testing', (string) $token);
     }
 
     /**
@@ -138,6 +138,6 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
      */
     public function readToFile()
     {
-        return trim(file_get_contents(sys_get_temp_dir().'/testing'));
+        return trim(file_get_contents(sys_get_temp_dir() . '/testing'));
     }
 }

@@ -11,10 +11,11 @@ abstract class PolicierMiddlewareHandler
     /**
      * Process Middleware
      *
+     * @param mixed $request
      * @param callable $next
      * @return mixed
      */
-    public function make($request, callable $next)
+    public function make(mixed $request, callable $next)
     {
         $bearer = $this->getTokenHeader($request);
 

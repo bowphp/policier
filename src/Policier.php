@@ -88,19 +88,19 @@ class Policier
     {
         $this->config = $config;
 
-        $this->builder = new Builder;
+        $this->builder = new Builder();
 
         if (!isset($this->algs[$this->config['alg']])) {
             throw new Exception\AlgorithmNotFoundException(
-                $this->config['alg'] .': Algorithm not found'
+                $this->config['alg'] . ': Algorithm not found'
             );
         }
 
-        $this->alg = new $this->algs[$this->config['alg']];
+        $this->alg = new $this->algs[$this->config['alg']]();
 
-        $this->keychain = new Keychain;
+        $this->keychain = new Keychain();
 
-        $this->validator = new ValidationData;
+        $this->validator = new ValidationData();
     }
 
     /**
@@ -281,7 +281,7 @@ class Policier
         if (isset($this->config['nbf']) && !is_null($this->config['nbf'])) {
             $this->builder->setNotBefore(time() + $this->config['nbf']);
         }
-        
+
         // Bind claim information before encoding
         foreach ($claims as $key => $value) {
             $value = is_array($value) || is_object($value) ? json_encode($value) : $value;
@@ -352,7 +352,7 @@ class Policier
      */
     public function parse($token)
     {
-        return (new Parser)
+        return (new Parser())
             ->parse((string) $token);
     }
 
@@ -415,6 +415,6 @@ class Policier
             );
         }
 
-        throw new \BadMethodCallException('Method "'.$method.'" not define');
+        throw new \BadMethodCallException('Method "' . $method . '" not define');
     }
 }
