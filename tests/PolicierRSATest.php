@@ -23,9 +23,11 @@ class PolicierRSATest extends \PHPUnit\Framework\TestCase
     {
         $config = require __DIR__.'/../config/policier.php';
 
-        $policier = Policier::configure($config);
+        Policier::configure($config);
 
-        $policier->setConfig([
+        $this->policier = Policier::getInstance();
+
+        $this->policier->setConfig([
             'singkey' => null,
             'alg' => 'RS512',
             'keychain' => [
@@ -33,8 +35,6 @@ class PolicierRSATest extends \PHPUnit\Framework\TestCase
                 'public' => trim(file_get_contents(__DIR__.'/seeds/rsa/public.key')),
             ],
         ]);
-
-        $this->policier = Policier::getInstance();
     }
 
     public function testEncode()

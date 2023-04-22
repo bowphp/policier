@@ -4,7 +4,8 @@
     "type": "library",
     "keywords": ["JWT", "Json Web Token", "Policier", "Franck DAKIA", "Policier PHP", "PHP JWT", "FranckDakia", "Papac"],
     "require": {
-        "lcobucci/jwt": "v3.2.5"
+        "lcobucci/jwt": "v3.2.5",
+        "php": "^8.0"
     },
     "autoload": {
         "psr-4": {
@@ -23,7 +24,7 @@
     ],
     "minimum-stability": "stable",
     "require-dev": {
-        "phpunit/phpunit": "^7"
+        "phpunit/phpunit": "^8"
     },
     "extra": {
         "laravel": {

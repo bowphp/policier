@@ -87,27 +87,25 @@ class Policier
     private function __construct(array $config)
     {
         $this->config = $config;
-
-        $this->builder = new Builder;
+        $this->builder = new Builder();
 
         if (!isset($this->algs[$this->config['alg']])) {
             throw new Exception\AlgorithmNotFoundException(
-                $this->config['alg'] .': Algorithm not found'
+                $this->config['alg'] . ': Algorithm not found'
             );
         }
 
-        $this->alg = new $this->algs[$this->config['alg']];
+        $this->alg = new $this->algs[$this->config['alg']]();
 
-        $this->keychain = new Keychain;
+        $this->keychain = new Keychain();
 
-        $this->validator = new ValidationData;
+        $this->validator = new ValidationData();
     }
 
     /**
      * Configuration
      *
      * @param array $config
-     *
      * @return void
      */
     public static function configure(array $config)
@@ -133,10 +131,9 @@ class Policier
      * Plug token
      *
      * @param string $token
-     *
      * @return void
      */
-    public function plug($token)
+    public function plug(string $token)
     {
         $this->token = $token;
     }
@@ -174,9 +171,10 @@ class Policier
     /**
      * Get the key
      *
+     * @param bool $public
      * @return string
      */
-    public function getKey($public = false)
+    public function getKey(bool $public = false)
     {
         $alg = $this->config['alg'];
 
@@ -205,10 +203,9 @@ class Policier
      * Get key content
      *
      * @param string $key
-     *
      * @return string
      */
-    private function getKeyContents($key)
+    private function getKeyContents(string $key)
     {
         if (is_file($key)) {
             return file_get_contents($key);
@@ -235,7 +232,6 @@ class Policier
      * Update config
      *
      * @param array $config
-     *
      * @return mixed
      */
     public function setConfig(array $config)
@@ -249,10 +245,9 @@ class Policier
      * Get Config
      *
      * @param string $key
-     *
      * @return mixed
      */
-    public function getConfig($key)
+    public function getConfig(string $key)
     {
         return $this->config[$key] ?? null;
     }
@@ -260,9 +255,8 @@ class Policier
     /**
      * Create new token
      *
-     * @param mixed $id
+     * @param int|string $id
      * @param array $claims
-     *
      * @return string
      */
     public function encode($id, array $claims)
@@ -281,7 +275,7 @@ class Policier
         if (isset($this->config['nbf']) && !is_null($this->config['nbf'])) {
             $this->builder->setNotBefore(time() + $this->config['nbf']);
         }
-        
+
         // Bind claim information before encoding
         foreach ($claims as $key => $value) {
             $value = is_array($value) || is_object($value) ? json_encode($value) : $value;
@@ -304,10 +298,9 @@ class Policier
      * Decode token
      *
      * @param string $token
-     *
      * @return array
      */
-    public function decode($token)
+    public function decode(string $token): array
     {
         $token = $this->parse($token);
 
@@ -330,10 +323,9 @@ class Policier
      * Verify token
      *
      * @param string $token
-     *
      * @return bool
      */
-    public function verify($token)
+    public function verify(string $token)
     {
         $token = $this->parse((string) $token);
 
@@ -347,24 +339,22 @@ class Policier
      * Parse token
      *
      * @param string $token
-     *
      * @return Token
      */
-    public function parse($token)
+    public function parse(string $token)
     {
-        return (new Parser)
-            ->parse((string) $token);
+        return (new Parser())->parse((string) $token);
     }
 
     /**
      * Validate token
      *
      * @param string $token
+     * @param int|string $id
      * @param array $claims
-     *
      * @return bool
      */
-    public function validate($token, $id, array $claims)
+    public function validate(string $token, $id, array $claims)
     {
         $token = $this->parse($token);
 
@@ -372,24 +362,16 @@ class Policier
         $this->validator->setAudience($this->config['aud']);
         $this->validator->setId($id, true);
 
-        foreach ($claims as $key => $value) {
-            $this->validator
-                ->set($key, $value);
-        }
-
-        return $token->validate(
-            $this->validator
-        );
+        return $token->validate($this->validator);
     }
 
     /**
      * Check if token is expired
      *
      * @param string $token
-     *
      * @return bool
      */
-    public function isExpired($token)
+    public function isExpired(string $token)
     {
         $token = $this->parse($token);
 
@@ -409,12 +391,9 @@ class Policier
         $policier = static::getInstance();
 
         if (method_exists($policier, $method)) {
-            return call_user_func_array(
-                [$policier, $method],
-                $args
-            );
+            return call_user_func_array([$policier, $method], $args);
         }
 
-        throw new \BadMethodCallException('Method "'.$method.'" not define');
+        throw new \BadMethodCallException('Method "' . $method . '" not define');
     }
 }
