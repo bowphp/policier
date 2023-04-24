@@ -94,7 +94,7 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
 
         $this->assertInstanceOf(\Policier\Token::class, $token);
 
-        $array = $token->toArray();
+        $array = $token->accessToken();
 
         $this->assertArrayHasKey('access_token', $array);
         $this->assertArrayHasKey('expire_in', $array);
@@ -111,6 +111,7 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
 
         $token = policier('decode', $token);
 
+        $this->assertTrue($token->has('name'));
         $this->assertEquals($token->get('name'), 'policier');
     }
 

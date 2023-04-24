@@ -70,7 +70,7 @@ final class Token
      *
      * @return array
      */
-    public function toArray(): array
+    public function accessToken(): array
     {
         return [
             'access_token' => $this->getValue(),
@@ -88,6 +88,28 @@ final class Token
     public function get(string $name, ?string $default = null): mixed
     {
         return $this->token->getClaim($name, $default);
+    }
+
+    /**
+     * Check the claims key
+     *
+     * @param string $name
+     * @param string|null $default
+     * @return mixed
+     */
+    public function has(string $name): bool
+    {
+        return $this->token->hasClaim($name);
+    }
+
+    /**
+     * Get the values
+     *
+     * @return array
+     */
+    public function getData(): array
+    {
+        return $this->token->getClaims();
     }
 
     /**
