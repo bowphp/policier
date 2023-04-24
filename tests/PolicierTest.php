@@ -22,7 +22,7 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
     public function setUp(): void
     {
         $policier = Policier::configure(
-            require __DIR__.'/../config/policier.php'
+            require __DIR__ . '/../config/policier.php'
         );
 
         $policier->setConfig([
@@ -121,7 +121,7 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
      */
     public function writeToFile($token)
     {
-        file_put_contents(sys_get_temp_dir().'/testing', (string) $token);
+        file_put_contents(sys_get_temp_dir() . '/testing', (string) $token);
     }
 
     /**
@@ -131,6 +131,6 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
      */
     public function readToFile()
     {
-        return trim(file_get_contents(sys_get_temp_dir().'/testing'));
+        return trim(file_get_contents(sys_get_temp_dir() . '/testing'));
     }
 }

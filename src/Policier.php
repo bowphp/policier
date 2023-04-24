@@ -242,7 +242,7 @@ class Policier
         $this->builder->unsign();
         $this->builder->setIssuer($this->config['iss']);
         $this->builder->setAudience($this->config['aud']);
-        $this->builder->setId(is_null($id) ? md5(uniqid() . '-'. time()) : $id, true);
+        $this->builder->setId(is_null($id) ? md5(uniqid() . '-' . time()) : $id, true);
         $this->builder->setIssuedAt(time());
         $this->builder->setExpiration(time() + $this->config['exp']);
 
@@ -256,7 +256,7 @@ class Policier
 
         // Bind claim information before encoding
         foreach ($claims as $key => $value) {
-            $value = is_array($value) || is_object($value) || $value instanceof \Iterator 
+            $value = is_array($value) || is_object($value) || $value instanceof \Iterator
                 ? json_encode($value)
                 : $value;
 
