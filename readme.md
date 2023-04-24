@@ -5,7 +5,7 @@
 <a href="https://github.com/bowphp/policier/blob/master/LICENSE" title="license"><img src="https://img.shields.io/github/license/mashape/apistatus.svg?style=flat-square"/></a>
 <a href="https://travis-ci.org/bowphp/policier" title="Travis branch"><img src="https://img.shields.io/travis/bowphp/policier/master.svg?style=flat-square"/></a>
 
-Policier allows to validate the request via [JWT](https://jwt.io).
+Policier allows to validation of the request via [JWT](https://jwt.io).
 
 To install the installation policy, you must use `composer` (PHP package manager) like this.
 
@@ -13,7 +13,7 @@ To install the installation policy, you must use `composer` (PHP package manager
 composer require bowphp/policier
 ```
 
-Documentation is available in [english](./docs/en.md) and [frensh](./docs/fr.md) and You can **[join us on slask](https://join.slack.com/t/bowphp/shared_invite/enQtNzMxOTQ0MTM2ODM5LTQ3MWQ3Mzc1NDFiNDYxMTAyNzBkNDJlMTgwNDJjM2QyMzA2YTk4NDYyN2NiMzM0YTZmNjU1YjBhNmJjZThiM2Q)**
+Documentation is available in [English](./docs/en.md) and [French](./docs/fr.md)
 
 ## Contributing
 
@@ -26,7 +26,7 @@ Thank you for considering contributing to Bow Framework! The contribution guide 
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
-5. Create new Pull Request
+5. Create a new Pull Request
 
 ## Contact
 
