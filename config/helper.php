@@ -23,7 +23,7 @@ if (!function_exists('policier')) {
             return $policier;
         }
 
-        if (!in_array($action, ['decode', 'encode', 'verify', 'validate', 'parse'])) {
+        if (!in_array($action, ['decode', 'encode', 'verify', 'parse'])) {
             throw new \BadMethodCallException("Action not define");
         }
 

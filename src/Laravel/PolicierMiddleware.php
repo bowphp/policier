@@ -15,7 +15,7 @@ class PolicierMiddleware extends \Policier\PolicierMiddlewareHandler
      *
      * @return mixed
      */
-    public function handle($request, \Closure $next, $guard = null)
+    public function handle(Request $request, \Closure $next, $guard = null)
     {
         return $this->make($request, $next);
     }

@@ -26,18 +26,18 @@ class Policier
     private $builder;
 
     /**
+     * The Lcobucci Token Parser
+     *
+     * @var Parser
+     */
+    private $parser;
+
+    /**
      * The algorithm defined
      *
      * @var mixed
      */
     private $alg;
-
-    /**
-     * The RSA and ECDSA key loader
-     *
-     * @var mixed
-     */
-    private $keychain;
 
     /**
      * The Data validation instance
@@ -88,6 +88,7 @@ class Policier
     {
         $this->config = $config;
         $this->builder = new Builder();
+        $this->parser = new Parser();
 
         if (!isset($this->algs[$this->config['alg']])) {
             throw new Exception\AlgorithmNotFoundException(
@@ -97,8 +98,6 @@ class Policier
 
         $this->alg = new $this->algs[$this->config['alg']]();
 
-        $this->keychain = new Keychain();
-
         $this->validator = new ValidationData();
     }
 
@@ -106,9 +105,9 @@ class Policier
      * Configuration
      *
      * @param array $config
-     * @return void
+     * @return Policier
      */
-    public static function configure(array $config)
+    public static function configure(array $config): Policier
     {
         if (static::$instance === null) {
             static::$instance = new static($config);
@@ -130,10 +129,22 @@ class Policier
     /**
      * Plug token
      *
+     * @deprecated 3.x
      * @param string $token
      * @return void
      */
     public function plug(string $token)
+    {
+        $this->token = $token;
+    }
+
+    /**
+     * Use the token for working on
+     *
+     * @param string $token
+     * @return void
+     */
+    public function useToken(string $token)
     {
         $this->token = $token;
     }
@@ -174,48 +185,15 @@ class Policier
      * @param bool $public
      * @return string
      */
-    public function getKey(bool $public = false)
+    public function getKey()
     {
-        $alg = $this->config['alg'];
+        $keystring = $this->config['signkey'];
 
-        if (! in_array($alg, ['RS256', 'RS384', 'RS512', 'ES256', 'ES384', 'ES512'])) {
-            $keystring = $this->config['signkey'];
-
-            if (is_null($keystring)) {
-                throw new Exception\InvalidSecretKeyException("You secret key is invalid.");
-            }
-
-            return $this->config['signkey'];
+        if (is_null($keystring)) {
+            throw new Exception\InvalidSecretKeyException("You secret key is invalid or not define.");
         }
 
-        if (!$public) {
-            return $this->keychain->getPrivateKey(
-                $this->getKeyContents($this->config['keychain']['private'])
-            );
-        }
-
-        return $this->keychain->getPublicKey(
-            $this->getKeyContents($this->config['keychain']['public'])
-        );
-    }
-
-    /**
-     * Get key content
-     *
-     * @param string $key
-     * @return string
-     */
-    private function getKeyContents(string $key)
-    {
-        if (is_file($key)) {
-            return file_get_contents($key);
-        }
-
-        if (is_null($key)) {
-            throw new Exception\InvalidSecretKeyException("The special your keys path.");
-        }
-
-        return $key;
+        return $this->config['signkey'];
     }
 
     /**
@@ -257,14 +235,14 @@ class Policier
      *
      * @param int|string $id
      * @param array $claims
-     * @return string
+     * @return EncodedToken
      */
-    public function encode($id, array $claims)
+    public function encode(int|string $id, array $claims): EncodedToken
     {
         $this->builder->unsign();
         $this->builder->setIssuer($this->config['iss']);
         $this->builder->setAudience($this->config['aud']);
-        $this->builder->setId($id, true);
+        $this->builder->setId(is_null($id) ? md5(uniqid() . '-'. time()) : $id, true);
         $this->builder->setIssuedAt(time());
         $this->builder->setExpiration(time() + $this->config['exp']);
 
@@ -278,7 +256,9 @@ class Policier
 
         // Bind claim information before encoding
         foreach ($claims as $key => $value) {
-            $value = is_array($value) || is_object($value) ? json_encode($value) : $value;
+            $value = is_array($value) || is_object($value) || $value instanceof \Iterator 
+                ? json_encode($value)
+                : $value;
 
             $this->builder->set($key, $value);
         }
@@ -286,50 +266,37 @@ class Policier
         // Make signature
         $this->builder->sign($this->getSignature(), $this->getKey());
 
-        $token = $this->builder->getToken();
-
         return new EncodedToken(
-            (string) $token,
-            $token->getClaim('exp')
+            $this->builder->getToken()
         );
     }
 
     /**
      * Decode token
      *
-     * @param string $token
-     * @return array
+     * @param ?string $token
+     * @return EncodedToken
      */
-    public function decode(string $token): array
+    public function decode(?string $token = null): EncodedToken
     {
-        $token = $this->parse($token);
+        $token = $this->normalizeToken($token);
 
-        $headers = [];
-
-        $claims = [];
-
-        foreach ($token->getHeaders() as $key => $value) {
-            $headers[$key] = $value;
-        }
-
-        foreach ($token->getClaims() as $key => $value) {
-            $claims[$key] = (string) $value;
-        }
-
-        return compact('headers', 'claims');
+        return new EncodedToken(
+            $this->parser->parse($token)
+        );
     }
 
     /**
      * Verify token
      *
-     * @param string $token
+     * @param ?string $token
      * @return bool
      */
-    public function verify(string $token)
+    public function verify(?string $token = null): bool
     {
-        $token = $this->parse((string) $token);
+        $token = $this->normalizeToken($token);
 
-        return $token->verify(
+        return $this->parser->parse($token)->verify(
             $this->getSignature(),
             $this->getKey(true)
         );
@@ -339,11 +306,15 @@ class Policier
      * Parse token
      *
      * @param string $token
-     * @return Token
+     * @return EncodedToken
      */
-    public function parse(string $token)
+    public function parse(?string $token = null): EncodedToken
     {
-        return (new Parser())->parse((string) $token);
+        $token = $this->normalizeToken($token);
+
+        return new EncodedToken(
+            $this->parser->parse($token)
+        );
     }
 
     /**
@@ -351,12 +322,11 @@ class Policier
      *
      * @param string $token
      * @param int|string $id
-     * @param array $claims
      * @return bool
      */
-    public function validate(string $token, $id, array $claims)
+    public function validate(string $token, int|string $id): bool
     {
-        $token = $this->parse($token);
+        $token = $this->parser->parse($token);
 
         $this->validator->setIssuer($this->config['iss']);
         $this->validator->setAudience($this->config['aud']);
@@ -371,11 +341,11 @@ class Policier
      * @param string $token
      * @return bool
      */
-    public function isExpired(string $token)
+    public function isExpired(?string $token = null)
     {
-        $token = $this->parse($token);
+        $token = $this->normalizeToken($token);
 
-        return $token->isExpired();
+        return $this->parse($token)->isExpired();
     }
 
     /**
@@ -395,5 +365,24 @@ class Policier
         }
 
         throw new \BadMethodCallException('Method "' . $method . '" not define');
+    }
+
+    /**
+     * Normalize the token
+     *
+     * @param string|null $token
+     * @return string
+     */
+    private function normalizeToken(?string $token): string
+    {
+        if (is_null($token)) {
+            $token = $this->token;
+        }
+
+        if (is_null($token)) {
+            throw new \InvalidArgumentException("Please set the token from useToken or pass the token");
+        }
+
+        return $token;
     }
 }

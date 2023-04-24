@@ -10,11 +10,11 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
     private $policier;
 
     /**
-     * The token information
+     * The id information
      *
-     * @var string
+     * @var int
      */
-    private $token;
+    private $id;
 
     /**
      * On setUp
@@ -27,11 +27,7 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
 
         $policier->setConfig([
             'alg' => 'HS512',
-            'signkey' => trim(file_get_contents(__DIR__.'/seeds/keystring')),
-            'keychain' => [
-                'private' => null,
-                'public' => null,
-            ]
+            'signkey' => "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlFdP9pwuj6lYndTuUFO6",
         ]);
 
         $this->policier = Policier::getInstance();
@@ -39,21 +35,19 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
 
     public function testShouldEncodeData()
     {
-        $id = 1;
-        
-        $this->token = $this->policier->encode($id, [
+        $token = $this->policier->encode(1, [
             'username' => "papac",
             'logged' => true
         ]);
 
-        $this->assertTrue($this->policier->verify($this->token));
+        $this->assertTrue($this->policier->verify($token));
 
-        $token = $this->policier->parse($this->token);
         $this->assertEquals($token->getHeader('alg'), 'HS512');
         $this->assertEquals($token->getHeader('typ'), 'JWT');
-        $this->assertEquals($token->getClaim('username'), 'papac');
-        $this->assertTrue($token->getClaim('logged'));
-        $this->writeToFile($this->token);
+        $this->assertEquals($token->get('username'), 'papac');
+        $this->assertTrue($token->get('logged'));
+
+        $this->writeToFile((string) $token);
     }
 
     /**
@@ -67,9 +61,8 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
 
         $token = $this->policier->decode($token);
 
-        $this->assertEquals($token['headers']['alg'], 'HS512');
-
-        $this->assertEquals($token['headers']['typ'], 'JWT');
+        $this->assertEquals($token->getHeader('alg'), 'HS512');
+        $this->assertEquals($token->getHeader('typ'), 'JWT');
     }
 
     /**
@@ -77,7 +70,7 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
      */
     public function testShouldEncodeViaHelper()
     {
-        $token = policier('encode', $id = 1, [
+        $token = policier('encode', 1, [
             'name' => 'policier'
         ]);
 
@@ -85,9 +78,9 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
 
         $token = policier('parse', $token);
 
-        $this->assertEquals($token->getClaim('name'), 'policier');
+        $this->assertEquals($token->get('name'), 'policier');
 
-        $this->writeToFile($token);
+        $this->writeToFile((string) $token);
     }
 
     /**
@@ -95,7 +88,7 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
      */
     public function testTransformTokenToArray()
     {
-        $token = policier('encode', $id = 1, [
+        $token = policier('encode', 1, [
             'name' => 'policier'
         ]);
 
@@ -104,7 +97,7 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
         $array = $token->toArray();
 
         $this->assertArrayHasKey('access_token', $array);
-        $this->assertArrayHasKey('expired_in', $array);
+        $this->assertArrayHasKey('expire_in', $array);
     }
 
     /**
@@ -118,7 +111,7 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
 
         $token = policier('decode', $token);
 
-        $this->assertEquals($token['claims']['name'], 'policier');
+        $this->assertEquals($token->get('name'), 'policier');
     }
 
     /**

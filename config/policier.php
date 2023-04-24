@@ -36,25 +36,10 @@ return [
      *
      * HS256, HS384, HS512, RS256, RS384, RS512, ES256, ES384, ES512,
      */
-    "alg" => "HS512",
+    "alg" => "RS512",
 
     /**
      * Signature using your
      */
-    'signkey' => null,
-
-    /**
-     * Signature using your RSA
-     */
-    "keychain" => [
-        /**
-         * Path to your private key
-         */
-        "private" => null,
-
-        /**
-         * Ptah to your public key
-         */
-        "public" => null
-    ]
+    'signkey' => null
 ];

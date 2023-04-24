@@ -34,7 +34,7 @@ abstract class PolicierMiddlewareHandler
             throw new TokenExpiredException($this->getExpirationMessage());
         }
 
-        $policier->plug($token);
+        $policier->useToken($token);
 
         return $next($request);
     }
