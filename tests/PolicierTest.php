@@ -10,85 +10,90 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
     private $policier;
 
     /**
-     * The id information
-     *
-     * @var int
-     */
-    private $id;
-
-    /**
      * On setUp
      */
     public function setUp(): void
     {
-        $policier = Policier::configure(
-            require __DIR__ . '/../config/policier.php'
+        $this->policier = Policier::configure(
+            require __DIR__ . '/config.php'
         );
-
-        $policier->setConfig([
-            'alg' => 'HS512',
-            'signkey' => "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlFdP9pwuj6lYndTuUFO6",
-        ]);
-
-        $this->policier = Policier::getInstance();
     }
 
-    public function testShouldEncodeData()
+    /**
+     * @dataProvider getAlgoProviders
+     */
+    public function testShouldEncodeData(string $alg)
     {
-        $token = $this->policier->encode(1, [
+        $policier = $this->policier->setConfig([
+            'alg' => $alg,
+        ]);
+
+        $token = $policier->encode(1, [
             'username' => "papac",
             'logged' => true
         ]);
 
-        $this->assertTrue($this->policier->verify($token));
+        $this->assertTrue($policier->verify($token));
 
-        $this->assertEquals($token->getHeader('alg'), 'HS512');
+        $this->assertEquals($token->getHeader('alg'), $alg);
         $this->assertEquals($token->getHeader('typ'), 'JWT');
         $this->assertEquals($token->get('username'), 'papac');
         $this->assertTrue($token->get('logged'));
 
-        $this->writeToFile((string) $token);
+        $this->writeToFile((string) $token, $alg);
     }
 
     /**
-     * @depends testShouldEncodeData
+     * @dataProvider getAlgoProviders
      */
-    public function testShouldDecodeData()
+    public function testShouldDecodeData(string $alg)
     {
-        $token = $this->readToFile();
+        $policier = $this->policier->setConfig([
+            'alg' => $alg,
+        ]);
 
-        $this->assertTrue($this->policier->verify($token));
+        $token = $this->readToFile($alg);
 
-        $token = $this->policier->decode($token);
+        $this->assertTrue($policier->verify($token));
 
-        $this->assertEquals($token->getHeader('alg'), 'HS512');
+        $token = $policier->decode($token);
+
+        $this->assertEquals($token->getHeader('alg'), $alg);
         $this->assertEquals($token->getHeader('typ'), 'JWT');
     }
 
     /**
-     * @depends testShouldDecodeData
+     * @dataProvider getAlgoProviders
      */
-    public function testShouldEncodeViaHelper()
+    public function testShouldEncodeViaHelper(string $alg)
     {
-        $token = policier('encode', 1, [
+        $policier = $this->policier->setConfig([
+            'alg' => $alg,
+        ]);
+
+        $token = $policier->encode(1, [
             'name' => 'policier'
         ]);
 
         $this->assertInstanceOf(\Policier\Token::class, $token);
 
-        $token = policier('parse', $token);
+        $token = $policier->parse($token);
 
         $this->assertEquals($token->get('name'), 'policier');
 
-        $this->writeToFile((string) $token);
+        $this->writeToFile((string) $token, $alg);
     }
 
     /**
-     * @depends testShouldDecodeData
+     * @dataProvider getAlgoProviders
      */
-    public function testTransformTokenToArray()
+    public function testTransformTokenToArray(string $alg)
     {
-        $token = policier('encode', 1, [
+        $policier = $this->policier->setConfig([
+            'alg' => $alg,
+        ]);
+
+        $token = $policier->encode(1, [
             'name' => 'policier'
         ]);
 
@@ -101,15 +106,22 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @depends testShouldEncodeData
+     * @dataProvider getAlgoProviders
      */
-    public function testShouldDecodeViaHelper()
+    public function testShouldDecodeViaHelper(string $alg)
     {
-        $token = $this->readToFile();
+        $policier = $this->policier->setConfig([
+            'alg' => $alg,
+        ]);
 
+        $token = $this->readToFile($alg);
         $this->assertTrue(is_string($token));
 
-        $token = policier('decode', $token);
+        $policier->setConfig([
+            'alg' => $alg,
+        ]);
+
+        $token = $policier->decode($token);
 
         $this->assertTrue($token->has('name'));
         $this->assertEquals($token->get('name'), 'policier');
@@ -120,18 +132,33 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
      *
      * @param mixed $token
      */
-    public function writeToFile($token)
+    public function writeToFile(mixed $token, string $alg)
     {
-        file_put_contents(sys_get_temp_dir() . '/testing', (string) $token);
+        file_put_contents(sys_get_temp_dir() . '/testing_' . $alg, (string) $token);
     }
 
     /**
-     * Write Token
+     * Read Token
      *
      * @return string
      */
-    public function readToFile()
+    public function readToFile(string $alg)
     {
-        return trim(file_get_contents(sys_get_temp_dir() . '/testing'));
+        return trim(file_get_contents(sys_get_temp_dir() . '/testing_' . $alg));
+    }
+
+    public function getAlgoProviders()
+    {
+        return [
+            // ["HS256"],
+            // ["HS384"],
+            // ["HS512"],
+            ["RS256"],
+            ["RS384"],
+            ["RS512"],
+            // ["ES256"],
+            // ["ES384"],
+            // ["ES512"],
+        ];
     }
 }

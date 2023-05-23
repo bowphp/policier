@@ -41,5 +41,7 @@ return [
     /**
      * Signature using your
      */
-    'signkey' => null
+    'signkey' => "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAlFdP9pwuj6lYndTuUFO6",
+
+    "rsa_key" => __DIR__. '/seeds/signkey.pem',
 ];

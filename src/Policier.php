@@ -2,12 +2,13 @@
 
 namespace Policier;
 
-use Policier\Token as EncodedToken;
-use Lcobucci\JWT\Builder;
-use Lcobucci\JWT\Signer\Keychain;
-use Lcobucci\JWT\Parser;
 use Lcobucci\JWT\Token;
+use Lcobucci\JWT\Parser;
+use Lcobucci\JWT\Builder;
+use Lcobucci\JWT\Signer\Key;
 use Lcobucci\JWT\ValidationData;
+use Lcobucci\JWT\Signer\Keychain;
+use Policier\Token as EncodedToken;
 
 class Policier
 {
@@ -182,18 +183,37 @@ class Policier
     /**
      * Get the key
      *
-     * @param bool $public
-     * @return string
+     * @return string|Key
      */
-    public function getKey()
+    public function getKey(): string|Key
     {
-        $keystring = $this->config['signkey'];
+        $signkey = $this->config['signkey'];
 
-        if (is_null($keystring)) {
-            throw new Exception\InvalidSecretKeyException("You secret key is invalid or not define.");
+        if (is_null($signkey)) {
+            throw new Exception\InvalidSecretKeyException(
+                "You secret key is invalid or not define."
+            );
         }
 
-        return $this->config['signkey'];
+        if (!in_array($this->config["alg"], ['RS256', 'RS384', 'RS512'])) {
+            return $signkey;
+        }
+
+        if (!isset($this->config["rsa_key"])) {
+            throw new Exception\InvalidSecretKeyException(
+                "RSA pem file or content is not provider."
+            );
+        }
+
+        $key_content = $this->config["rsa_key"];
+
+        if (is_file($key_content)) {
+            $key_content = file_get_contents(
+                $key_content
+            );
+        }
+
+        return new Key($key_content, $this->config["rsa_passphrase"] ?? null);
     }
 
     /**
@@ -210,13 +230,15 @@ class Policier
      * Update config
      *
      * @param array $config
-     * @return mixed
+     * @return Policier
      */
-    public function setConfig(array $config)
+    public function setConfig(array $config): Policier
     {
         $this->config = array_merge($this->config, $config);
 
         static::$instance = new static($this->config);
+
+        return static::$instance;
     }
 
     /**
@@ -298,7 +320,7 @@ class Policier
 
         return $this->parser->parse($token)->verify(
             $this->getSignature(),
-            $this->getKey(true)
+            $this->getKey()
         );
     }
 
