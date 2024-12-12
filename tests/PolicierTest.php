@@ -10,13 +10,6 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
     private $policier;
 
     /**
-     * The id information
-     *
-     * @var int
-     */
-    private $id;
-
-    /**
      * On setUp
      */
     public function setUp(): void
