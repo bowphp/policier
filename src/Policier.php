@@ -2,12 +2,18 @@
 
 namespace Policier;
 
+use DateTimeImmutable;
+use Lcobucci\JWT\Configuration;
+use Lcobucci\JWT\Signer;
+use Lcobucci\JWT\Signer\Key\InMemory;
+use Lcobucci\JWT\Token\RegisteredClaims;
+use Lcobucci\JWT\UnencryptedToken;
+use Lcobucci\JWT\Validation\Constraint\IdentifiedBy;
+use Lcobucci\JWT\Validation\Constraint\LooseValidAt;
+use Lcobucci\JWT\Validation\Constraint\IssuedBy;
+use Lcobucci\JWT\Validation\Constraint\PermittedFor;
+use Lcobucci\JWT\Validation\Constraint\SignedWith;
 use Policier\Token as EncodedToken;
-use Lcobucci\JWT\Builder;
-use Lcobucci\JWT\Signer\Keychain;
-use Lcobucci\JWT\Parser;
-use Lcobucci\JWT\Token;
-use Lcobucci\JWT\ValidationData;
 
 class Policier
 {
@@ -16,56 +22,35 @@ class Policier
      *
      * @var array
      */
-    private $config;
+    private array $config;
 
     /**
-     * The Lcobucci Token builder
+     * The Lcobucci JWT configuration
      *
-     * @var Builder
+     * @var Configuration|null
      */
-    private $builder;
-
-    /**
-     * The Lcobucci Token Parser
-     *
-     * @var Parser
-     */
-    private $parser;
-
-    /**
-     * The algorithm defined
-     *
-     * @var mixed
-     */
-    private $alg;
-
-    /**
-     * The Data validation instance
-     *
-     * @var ValidationData
-     */
-    private $validator;
+    private ?Configuration $jwtConfig = null;
 
     /**
      * The current Token
      *
-     * @var string
+     * @var string|null
      */
-    private $token;
+    private ?string $token = null;
 
     /**
      * The Policier instance
      *
-     * @var Policier
+     * @var Policier|null
      */
-    private static $instance;
+    private static ?Policier $instance = null;
 
     /**
-     * Key list
+     * Algorithms map
      *
-     * @var array
+     * @var array<string, class-string<Signer>>
      */
-    private $algs = [
+    private array $algs = [
         'RS256' => \Lcobucci\JWT\Signer\Rsa\Sha256::class,
         'RS384' => \Lcobucci\JWT\Signer\Rsa\Sha384::class,
         'RS512' => \Lcobucci\JWT\Signer\Rsa\Sha512::class,
@@ -74,31 +59,57 @@ class Policier
         'HS512' => \Lcobucci\JWT\Signer\Hmac\Sha512::class,
         'ES256' => \Lcobucci\JWT\Signer\Ecdsa\Sha256::class,
         'ES384' => \Lcobucci\JWT\Signer\Ecdsa\Sha384::class,
-        'ES512' => \Lcobucci\JWT\Signer\Ecdsa\Sha512::class
+        'ES512' => \Lcobucci\JWT\Signer\Ecdsa\Sha512::class,
     ];
+
+    private const SYMMETRIC_ALGS = ['HS256', 'HS384', 'HS512'];
 
     /**
      * Policier constructor
      *
      * @param array $config
-     *
-     * @return void
      */
     private function __construct(array $config)
     {
         $this->config = $config;
-        $this->builder = new Builder();
-        $this->parser = new Parser();
 
         if (!isset($this->algs[$this->config['alg']])) {
             throw new Exception\AlgorithmNotFoundException(
                 $this->config['alg'] . ': Algorithm not found'
             );
         }
+    }
 
-        $this->alg = new $this->algs[$this->config['alg']]();
+    /**
+     * Get (and lazily build) the lcobucci/jwt configuration container
+     */
+    private function jwtConfig(): Configuration
+    {
+        if ($this->jwtConfig !== null) {
+            return $this->jwtConfig;
+        }
 
-        $this->validator = new ValidationData();
+        $signer = new $this->algs[$this->config['alg']]();
+        $signKey = $this->getKey();
+
+        if (in_array($this->config['alg'], self::SYMMETRIC_ALGS, true)) {
+            $this->jwtConfig = Configuration::forSymmetricSigner(
+                $signer,
+                InMemory::plainText($signKey)
+            );
+
+            return $this->jwtConfig;
+        }
+
+        $verifyKey = $this->config['verifykey'] ?? $signKey;
+
+        $this->jwtConfig = Configuration::forAsymmetricSigner(
+            $signer,
+            InMemory::plainText($signKey),
+            InMemory::plainText($verifyKey)
+        );
+
+        return $this->jwtConfig;
     }
 
     /**
@@ -119,9 +130,9 @@ class Policier
     /**
      * Get instance
      *
-     * @return Policier
+     * @return Policier|null
      */
-    public static function getInstance()
+    public static function getInstance(): ?Policier
     {
         return static::$instance;
     }
@@ -133,7 +144,7 @@ class Policier
      * @param string $token
      * @return void
      */
-    public function plug(string $token)
+    public function plug(string $token): void
     {
         $this->token = $token;
     }
@@ -144,7 +155,7 @@ class Policier
      * @param string $token
      * @return void
      */
-    public function useToken(string $token)
+    public function useToken(string $token): void
     {
         $this->token = $token;
     }
@@ -152,9 +163,9 @@ class Policier
     /**
      * Get plug token
      *
-     * @return string
+     * @return string|null
      */
-    public function getToken()
+    public function getToken(): ?string
     {
         return $this->token;
     }
@@ -162,9 +173,9 @@ class Policier
     /**
      * Get parsed token
      *
-     * @return Token
+     * @return EncodedToken
      */
-    public function getParsedToken()
+    public function getParsedToken(): EncodedToken
     {
         return $this->parse($this->token);
     }
@@ -172,9 +183,9 @@ class Policier
     /**
      * Get decode token
      *
-     * @return array
+     * @return EncodedToken
      */
-    public function getDecodeToken()
+    public function getDecodeToken(): EncodedToken
     {
         return $this->decode($this->token);
     }
@@ -182,37 +193,36 @@ class Policier
     /**
      * Get the key
      *
-     * @param bool $public
      * @return string
      */
-    public function getKey()
+    public function getKey(): string
     {
-        $keystring = $this->config['signkey'];
+        $keystring = $this->config['signkey'] ?? null;
 
         if (is_null($keystring)) {
             throw new Exception\InvalidSecretKeyException("You secret key is invalid or not define.");
         }
 
-        return $this->config['signkey'];
+        return $keystring;
     }
 
     /**
      * Get signature
      *
-     * @return mixed
+     * @return Signer
      */
-    public function getSignature()
+    public function getSignature(): Signer
     {
-        return $this->alg;
+        return $this->jwtConfig()->signer();
     }
 
     /**
      * Update config
      *
      * @param array $config
-     * @return mixed
+     * @return void
      */
-    public function setConfig(array $config)
+    public function setConfig(array $config): void
     {
         $this->config = array_merge($this->config, $config);
 
@@ -225,7 +235,7 @@ class Policier
      * @param string $key
      * @return mixed
      */
-    public function getConfig(string $key)
+    public function getConfig(string $key): mixed
     {
         return $this->config[$key] ?? null;
     }
@@ -239,86 +249,95 @@ class Policier
      */
     public function encode(int|string $id, array $claims): EncodedToken
     {
-        $this->builder->unsign();
-        $this->builder->setIssuer($this->config['iss']);
-        $this->builder->setAudience($this->config['aud']);
-        $this->builder->setId(is_null($id) ? md5(uniqid() . '-' . time()) : $id, true);
-        $this->builder->setIssuedAt(time());
-        $this->builder->setExpiration(time() + $this->config['exp']);
+        $now = new DateTimeImmutable();
+
+        $builder = $this->jwtConfig()->builder()
+            ->issuedBy($this->config['iss'])
+            ->permittedFor($this->config['aud'])
+            ->identifiedBy((string) $id)
+            ->issuedAt($now)
+            ->expiresAt($now->modify('+' . (int) $this->config['exp'] . ' seconds'));
 
         if (isset($this->config['sub'])) {
-            $this->builder->setSubject($this->config['sub']);
+            $builder = $builder->relatedTo($this->config['sub']);
         }
 
         if (isset($this->config['nbf']) && !is_null($this->config['nbf'])) {
-            $this->builder->setNotBefore(time() + $this->config['nbf']);
+            $builder = $builder->canOnlyBeUsedAfter($now->modify('+' . (int) $this->config['nbf'] . ' seconds'));
         }
 
-        // Bind claim information before encoding
         foreach ($claims as $key => $value) {
+            if (in_array($key, RegisteredClaims::ALL, true)) {
+                continue;
+            }
+
             $value = is_array($value) || is_object($value) || $value instanceof \Iterator
                 ? json_encode($value)
                 : $value;
 
-            $this->builder->set($key, $value);
+            $builder = $builder->withClaim($key, $value);
         }
 
-        // Make signature
-        $this->builder->sign($this->getSignature(), $this->getKey());
-
         return new EncodedToken(
-            $this->builder->getToken()
+            $builder->getToken($this->jwtConfig()->signer(), $this->jwtConfig()->signingKey())
         );
     }
 
     /**
      * Decode token
      *
-     * @param ?string $token
+     * @param string|null $token
      * @return EncodedToken
      */
     public function decode(?string $token = null): EncodedToken
     {
-        $token = $this->normalizeToken($token);
-
-        return new EncodedToken(
-            $this->parser->parse($token)
-        );
+        return $this->parse($token);
     }
 
     /**
-     * Verify token
+     * Verify token signature
      *
-     * @param ?string $token
+     * @param string|null $token
      * @return bool
      */
     public function verify(?string $token = null): bool
     {
         $token = $this->normalizeToken($token);
 
-        return $this->parser->parse($token)->verify(
-            $this->getSignature(),
-            $this->getKey(true)
+        try {
+            $parsed = $this->jwtConfig()->parser()->parse($token);
+        } catch (\Throwable) {
+            return false;
+        }
+
+        $constraint = new SignedWith(
+            $this->jwtConfig()->signer(),
+            $this->jwtConfig()->verificationKey()
         );
+
+        return $this->jwtConfig()->validator()->validate($parsed, $constraint);
     }
 
     /**
      * Parse token
      *
-     * @param string $token
+     * @param string|null $token
      * @return EncodedToken
      */
     public function parse(?string $token = null): EncodedToken
     {
         $token = $this->normalizeToken($token);
+        $parsed = $this->jwtConfig()->parser()->parse($token);
 
-        return new EncodedToken(
-            $this->parser->parse($token)
-        );
+        if (!$parsed instanceof UnencryptedToken) {
+            throw new \RuntimeException('Encrypted tokens are not supported.');
+        }
+
+        return new EncodedToken($parsed);
     }
 
     /**
-     * Validate token
+     * Validate token claims
      *
      * @param string $token
      * @param int|string $id
@@ -326,22 +345,35 @@ class Policier
      */
     public function validate(string $token, int|string $id): bool
     {
-        $token = $this->parser->parse($token);
+        try {
+            $parsed = $this->jwtConfig()->parser()->parse($token);
+        } catch (\Throwable) {
+            return false;
+        }
 
-        $this->validator->setIssuer($this->config['iss']);
-        $this->validator->setAudience($this->config['aud']);
-        $this->validator->setId($id, true);
+        $constraints = [
+            // Without SignedWith the signature is never verified, so a token
+            // forged with any key would pass claim validation (CWE-347).
+            new SignedWith(
+                $this->jwtConfig()->signer(),
+                $this->jwtConfig()->verificationKey()
+            ),
+            new LooseValidAt($this->clock()),
+            new IssuedBy($this->config['iss']),
+            new PermittedFor($this->config['aud']),
+            new IdentifiedBy((string) $id),
+        ];
 
-        return $token->validate($this->validator);
+        return $this->jwtConfig()->validator()->validate($parsed, ...$constraints);
     }
 
     /**
      * Check if token is expired
      *
-     * @param string $token
+     * @param string|null $token
      * @return bool
      */
-    public function isExpired(?string $token = null)
+    public function isExpired(?string $token = null): bool
     {
         $token = $this->normalizeToken($token);
 
@@ -349,11 +381,74 @@ class Policier
     }
 
     /**
+     * Verify the signature and expiry, then return the parsed token.
+     *
+     * Unlike decode()/parse(), which never check the signature, this refuses
+     * a token whose signature is invalid or that has expired. Use it whenever
+     * you read claims you intend to trust.
+     *
+     * @param string|null $token
+     * @return EncodedToken
+     */
+    public function authenticate(?string $token = null): EncodedToken
+    {
+        $token = $this->normalizeToken($token);
+
+        if (!$this->verify($token)) {
+            throw new Exception\TokenInvalidException('The token signature is invalid.');
+        }
+
+        $parsed = $this->parse($token);
+
+        if ($parsed->isExpired()) {
+            throw new Exception\TokenExpiredException('The token is expired.');
+        }
+
+        return $parsed;
+    }
+
+    /**
+     * Check the token was issued by, and is permitted for, the configured
+     * issuer/audience. Does not verify the signature on its own.
+     *
+     * @param string $token
+     * @return bool
+     */
+    public function matchesConfiguredAudience(string $token): bool
+    {
+        try {
+            $parsed = $this->jwtConfig()->parser()->parse($token);
+        } catch (\Throwable) {
+            return false;
+        }
+
+        return $this->jwtConfig()->validator()->validate(
+            $parsed,
+            new IssuedBy($this->config['iss']),
+            new PermittedFor($this->config['aud'])
+        );
+    }
+
+    /**
+     * A PSR clock used by the time-based JWT constraints.
+     *
+     * @return \Psr\Clock\ClockInterface
+     */
+    private function clock(): \Psr\Clock\ClockInterface
+    {
+        return new class implements \Psr\Clock\ClockInterface {
+            public function now(): \DateTimeImmutable
+            {
+                return new \DateTimeImmutable();
+            }
+        };
+    }
+
+    /**
      * __callStatic
      *
      * @param string $method
      * @param array $args
-     *
      * @return mixed
      */
     public static function __callStatic($method, $args)

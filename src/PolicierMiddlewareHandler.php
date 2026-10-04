@@ -34,6 +34,10 @@ abstract class PolicierMiddlewareHandler
             throw new TokenExpiredException($this->getExpirationMessage());
         }
 
+        if (!$policier->matchesConfiguredAudience($token)) {
+            throw new TokenInvalidException($this->getInvalidMessage());
+        }
+
         $policier->useToken($token);
 
         return $next($request);
