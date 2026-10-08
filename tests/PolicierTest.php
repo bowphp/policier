@@ -1,5 +1,6 @@
 <?php
 
+use PHPUnit\Framework\Attributes\Depends;
 use Policier\Policier;
 
 class PolicierTest extends \PHPUnit\Framework\TestCase
@@ -43,9 +44,7 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
         $this->writeToFile((string) $token);
     }
 
-    /**
-     * @depends testShouldEncodeData
-     */
+    #[Depends('testShouldEncodeData')]
     public function testShouldDecodeData()
     {
         $token = $this->readToFile();
@@ -58,9 +57,7 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
         $this->assertEquals($token->getHeader('typ'), 'JWT');
     }
 
-    /**
-     * @depends testShouldDecodeData
-     */
+    #[Depends('testShouldDecodeData')]
     public function testShouldEncodeViaHelper()
     {
         $token = policier('encode', 1, [
@@ -76,9 +73,7 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
         $this->writeToFile((string) $token);
     }
 
-    /**
-     * @depends testShouldDecodeData
-     */
+    #[Depends('testShouldDecodeData')]
     public function testTransformTokenToArray()
     {
         $token = policier('encode', 1, [
@@ -93,9 +88,7 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
         $this->assertArrayHasKey('expire_in', $array);
     }
 
-    /**
-     * @depends testShouldEncodeData
-     */
+    #[Depends('testShouldEncodeData')]
     public function testShouldDecodeViaHelper()
     {
         $token = $this->readToFile();
@@ -106,6 +99,34 @@ class PolicierTest extends \PHPUnit\Framework\TestCase
 
         $this->assertTrue($token->has('name'));
         $this->assertEquals($token->get('name'), 'policier');
+    }
+
+    /**
+     * A token forged with an attacker's own key must be rejected by the
+     * signature check and by validate()/authenticate() (CWE-347 regression).
+     */
+    public function testValidateRejectsForgedSignature()
+    {
+        $evil = \Lcobucci\JWT\Configuration::forSymmetricSigner(
+            new \Lcobucci\JWT\Signer\Hmac\Sha512(),
+            \Lcobucci\JWT\Signer\Key\InMemory::plainText(str_repeat('a', 64))
+        );
+
+        $now = new \DateTimeImmutable();
+        $forged = $evil->builder()
+            ->issuedBy('localhost')
+            ->permittedFor('localhost')
+            ->identifiedBy('42')
+            ->issuedAt($now)
+            ->expiresAt($now->modify('+1 hour'))
+            ->getToken($evil->signer(), $evil->signingKey())
+            ->toString();
+
+        $this->assertFalse($this->policier->verify($forged));
+        $this->assertFalse($this->policier->validate($forged, 42));
+
+        $this->expectException(\Policier\Exception\TokenInvalidException::class);
+        $this->policier->authenticate($forged);
     }
 
     /**

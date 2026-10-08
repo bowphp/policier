@@ -2,24 +2,25 @@
 
 namespace Policier;
 
+use DateTimeImmutable;
 use DateTimeInterface;
+use Lcobucci\JWT\UnencryptedToken;
 
 final class Token
 {
     /**
      * The token
      *
-     * @var \Lcobucci\JWT\Token
+     * @var UnencryptedToken
      */
-    private \Lcobucci\JWT\Token $token;
+    private UnencryptedToken $token;
 
     /**
      * Token constructor
      *
-     * @param \Lcobucci\JWT\Token $token
-     * @return void
+     * @param UnencryptedToken $token
      */
-    public function __construct(\Lcobucci\JWT\Token $token)
+    public function __construct(UnencryptedToken $token)
     {
         $this->token = $token;
     }
@@ -31,7 +32,7 @@ final class Token
      */
     public function getValue(): string
     {
-        return (string) $this->token;
+        return $this->token->toString();
     }
 
     /**
@@ -41,18 +42,24 @@ final class Token
      */
     public function expireIn(): int
     {
-        return $this->token->getClaim('exp');
+        $exp = $this->token->claims()->get('exp');
+
+        if ($exp instanceof DateTimeInterface) {
+            return $exp->getTimestamp();
+        }
+
+        return (int) $exp;
     }
 
     /**
-     * Get the token exp value
+     * Check whether the token is expired
      *
-     * @param ?DateTimeInterface $time
+     * @param DateTimeInterface|null $time
      * @return bool
      */
     public function isExpired(?DateTimeInterface $time = null): bool
     {
-        return $this->token->isExpired($time);
+        return $this->token->isExpired($time ?? new DateTimeImmutable());
     }
 
     /**
@@ -82,24 +89,27 @@ final class Token
      * Get the value on claims
      *
      * @param string $name
-     * @param string|null $default
+     * @param mixed $default
      * @return mixed
      */
-    public function get(string $name, ?string $default = null): mixed
+    public function get(string $name, mixed $default = null): mixed
     {
-        return $this->token->getClaim($name, $default);
+        if (!$this->token->claims()->has($name)) {
+            return $default;
+        }
+
+        return $this->token->claims()->get($name);
     }
 
     /**
      * Check the claims key
      *
      * @param string $name
-     * @param string|null $default
-     * @return mixed
+     * @return bool
      */
     public function has(string $name): bool
     {
-        return $this->token->hasClaim($name);
+        return $this->token->claims()->has($name);
     }
 
     /**
@@ -109,7 +119,7 @@ final class Token
      */
     public function getData(): array
     {
-        return $this->token->getClaims();
+        return $this->token->claims()->all();
     }
 
     /**
@@ -119,17 +129,17 @@ final class Token
      */
     public function getHeaders(): array
     {
-        return $this->token->getHeaders();
+        return $this->token->headers()->all();
     }
 
     /**
      * Return the token specific header
      *
      * @param string $name
-     * @return array
+     * @return mixed
      */
     public function getHeader(string $name): mixed
     {
-        return $this->token->getHeader($name);
+        return $this->token->headers()->get($name);
     }
 }
